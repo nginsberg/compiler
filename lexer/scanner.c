@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
 
     int token = yylex();
     char* name;
-    while (token != EOF) {
+    while (token != 0) {
         name = lookup_token(token);
         printf("%d  %s \"%s\"\n",
          yylineno, name, yytext);
