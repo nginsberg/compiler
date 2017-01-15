@@ -1,6 +1,7 @@
 /**
 * A simple sample Quack program
 */
+// Also a comment
 class Pt(x: Int, y: Int) {
     this.x = x;
     this.y = y;

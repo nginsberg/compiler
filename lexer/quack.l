@@ -14,15 +14,40 @@ else     { return ELSE; }
 while    { return WHILE; }
 return   { return RETURN; }
 
-{        { return '{'; }
-}        { return '}'; }
-\(       { return '('; }
-\)       { return ')'; }
-\[       { return '['; }
-\]       { return ']'; }
+\{             { return '{'; }
+\}             { return '}'; }
+\(             { return '('; }
+\)             { return ')'; }
+\[             { return '['; }
+\]             { return ']'; }
 
-[ \t]    { ; }
-<<EOF>>  { return EOF; }
+\:             { return ':'; }
+\,             { return ','; }
+\=             { return '='; }
+\;             { return ';'; }
+\.             { return '.'; }
+
+\+             { return '+'; }
+\-             { return '-'; }
+\*             { return '*'; }
+\/             { return '/'; }
+
+\<             { return '<'; }
+\>             { return '>'; }
+\=\=           { return EQUALS; }
+\<=            { return ATMOST; }
+\>=            { return ATLEAST; }
+and            { return AND; }
+or             { return OR; }
+not            { return NOT; }
+
+[a-zA-Z0-9_]*  { return IDENT; }
+[0-9]*         { return INT_LIT; }
+["](([\\][0btnrf"\\])|[^"\\])*["] { return STRING_LIT; }
+
+\/\/.*           { ; }
+[ \t]          { ; }
+<<EOF>>        { return EOF; }
 
 [\n]    { ++yylineno; } // Keep track of line number
 %%
