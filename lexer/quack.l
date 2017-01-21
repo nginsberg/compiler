@@ -55,8 +55,7 @@ not                     { return NOT; }
     str = "";
     BEGIN(STRING);
 }
-<STRING>.               { str += yytext; }
-<STRING>\n              { str += yytext; }
+<STRING>.|\n               { str += yytext; }
 <STRING>[']['][']       {
     yytext = (char *)str.c_str();
     BEGIN(INITIAL);
@@ -64,5 +63,9 @@ not                     { return NOT; }
 }
 
 <COMMENT,INITIAL>\n {}
-["](([\\].)|[^"\\])*["] { return STRING_LIT; }
+["](([\\][0btnrf"\\])|[^"\\\n])*["] { return STRING_LIT; }
+["](([\\][0btnrf"\\])|[^"\\\n])*\n  {
+    cerr << yylineno << ":  Unclosed string?  Encountered newline in quoted string. ( at '" << yytext << "')" << endl;
+    return STRING_LIT;
+}
 %%
