@@ -44,12 +44,12 @@ __3
 "string"
 "str\"ing"
 "\nstring\t"
-
+"ok\ngood"
 // comment
 /* comment
 still comment
 comment */
 identifier
-'''string
+'''string\b
 still string
 string '''

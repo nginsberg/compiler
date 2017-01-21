@@ -6,6 +6,7 @@
     #define YY_DECL extern "C" int yylex()
     string str;
 %}
+%option yylineno
 %x COMMENT
 %x STRING
 %%
@@ -55,13 +56,13 @@ not                     { return NOT; }
     BEGIN(STRING);
 }
 <STRING>.               { str += yytext; }
+<STRING>\n              { str += yytext; }
 <STRING>[']['][']       {
     yytext = (char *)str.c_str();
     BEGIN(INITIAL);
     return STRING_LIT;
 }
 
-
-<*>[\n]  { ++yylineno; }
+<COMMENT,INITIAL>\n {}
 ["](([\\].)|[^"\\])*["] { return STRING_LIT; }
 %%
