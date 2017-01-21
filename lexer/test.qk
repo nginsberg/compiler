@@ -1,2 +1,55 @@
+class
+def
+extends
+if
+elif
+else
+while
+return
+
+{
+}
+(
+)
+[
+]
+
+:
+,
+=
+;
+.
+
++
+-
+*
+/
+
+<
+>
+==
+<=
+>=
+and
+or
+not
+
 test_ident
-0074830
+_test_ident
+____
+__3
+3
+45
+29
+"string"
+"str\"ing"
+"\nstring\t"
+
+// comment
+/* comment
+still comment
+comment */
+identifier
+'''string
+still string
+string '''
