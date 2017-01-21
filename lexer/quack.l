@@ -52,12 +52,12 @@ not                     { return NOT; }
 <COMMENT>[*][/]         { BEGIN(INITIAL); }
 <COMMENT>.              { ; }
 
-[']['][']               {
+["]["]["]               {
     str = "";
     BEGIN(STRING);
 }
 <STRING>.|\n               { str += yytext; }
-<STRING>[']['][']       {
+<STRING>["]["]["]       {
     yytext = (char *)str.c_str();
     BEGIN(INITIAL);
     return STRING_LIT;
