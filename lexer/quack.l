@@ -5,6 +5,7 @@
     using namespace std;
     #define YY_DECL extern "C" int yylex()
     string str;
+    void printError(string err);
 %}
 %option yylineno
 %x COMMENT
@@ -64,8 +65,15 @@ not                     { return NOT; }
 
 <COMMENT,INITIAL>\n {}
 ["](([\\][0btnrf"\\])|[^"\\\n])*["] { return STRING_LIT; }
-["](([\\][0btnrf"\\])|[^"\\\n])*\n  {
-    cerr << yylineno << ":  Unclosed string?  Encountered newline in quoted string. ( at '" << yytext << "')" << endl;
+["](([\\].)|[^"\\\n])*\n  {
+    printError(":  Unclosed string?  Encountered newline in quoted string.");
+    return STRING_LIT;
+}
+["](([\\].)|[^"\\\n])*["] {
+    printError("Illegal escape code; only \\\\, \\0, \\t, \\n, \\r are permitted");
     return STRING_LIT;
 }
 %%
+void printError(string err) {
+    cerr << yylineno << ": " << err << " ( at '" << yytext << "')" << endl;
+}
