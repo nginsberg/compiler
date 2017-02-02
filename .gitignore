@@ -36,6 +36,11 @@
 ehthumbs.db
 Thumbs.db
 
-lex.yy.c
-lex.yy.h
+*.yy.c
+*.yy.h
+*.txt
 scanner
+out
+
+*.tab.h
+*.tab.c
