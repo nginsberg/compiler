@@ -58,24 +58,24 @@ footer:
 %%
 
 int main(int, char**) {
-  // open a file handle to a particular file:
-  FILE *myfile = fopen("in.snazzle", "r");
-  // make sure it's valid:
-  if (!myfile) {
-    cout << "I can't open a.snazzle.file!" << endl;
-    return -1;
-  }
-  // set lex to read from it instead of defaulting to STDIN:
-  yyin = myfile;
+    // open a file handle to a particular file:
+    FILE *myfile = fopen("in.snazzle", "r");
+    // make sure it's valid:
+    if (!myfile) {
+        cout << "I can't open a.snazzle.file!" << endl;
+        return -1;
+    }
+    // set lex to read from it instead of defaulting to STDIN:
+    yyin = myfile;
 
-  // lex through the input:
-  do {
-    yyparse();
-  } while (!feof(yyin));
+    // lex through the input:
+    do {
+        yyparse();
+    } while (!feof(yyin));
 }
 
 void yyerror(const char *s) {
-    cout << "EEK, parse error! Message: " << s << endl;
-    // might as well halt now:
-    exit(-1);
+        cout << "EEK, parse error! Message: " << s << endl;
+        // might as well halt now:
+        exit(-1);
 }
