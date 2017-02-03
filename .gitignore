@@ -40,7 +40,9 @@ Thumbs.db
 *.yy.h
 *.txt
 scanner
+parser
 out
 
 *.tab.h
 *.tab.c
+samples/

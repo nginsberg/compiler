@@ -6,6 +6,7 @@
     extern "C" int yylex();
     extern "C" int yyparse();
     extern "C" FILE *yyin;
+    extern "C" int yylineno;
 
     void yyerror(const char *s);
 %}
@@ -16,6 +17,8 @@
 }
 
 %define parse.error verbose
+%left '+' '-'
+%left '*' '/'
 
 %token CLASS
 %token DEF
@@ -37,20 +40,36 @@
 %token <sval> STRING_LIT
 
 %%
+// Top level rule
 program:
-    classes { cout << "done with a quack file!" << endl; }
-    ; // statements;
+    classes statements { cout << "Finished parse with no errors" << endl; }
+    ;
+
+// Classes
 classes:
-    classes class
+    %empty
+    | classes class
     | class
     ;
-//statements: statements statement | statement;
 class:
-    class_signature
-    ; // class_body;
+    class_signature class_body
+    ;
 class_signature:
     CLASS IDENT '(' formal_args ')'
     | CLASS IDENT '(' formal_args ')' EXTENDS IDENT
+    ;
+class_body:
+    '{' statements methods '}'
+    ;
+
+// Methods
+methods:
+    %empty
+    | methods method
+    | method
+    ;
+method:
+    DEF IDENT '(' formal_args ')' return statement_block
     ;
 formal_args:
     formal_args ',' formal_arg
@@ -59,6 +78,94 @@ formal_args:
 formal_arg:
     %empty
     | IDENT ':' IDENT
+    ;
+return:
+    %empty
+    | ':' IDENT
+
+// Statements
+statements:
+    statements statement
+    | statement
+    ;
+statement_block:
+    '{' statements '}'
+    ;
+
+// Control structures
+statement:
+    IF r_expr statement_block
+    elifs
+    else
+elifs:
+    %empty
+    | elifs elif
+    | elif
+    ;
+elif:
+    ELIF r_expr statement_block
+    ;
+else:
+    %empty
+    | ELSE statement_block
+    ;
+
+statement:
+    WHILE r_expr statement_block;
+
+// Return
+statement:
+    RETURN optional_r_expr ';'
+    ;
+optional_r_expr:
+    %empty
+    | r_expr
+    ;
+
+// Assignment
+statement:
+    l_expr return '=' r_expr ';'
+    ;
+l_expr:
+    IDENT
+    | r_expr '.' IDENT
+    ;
+
+// Bare Expressions
+statement:
+    r_expr ';'
+    ;
+
+// Empty
+statement:
+    %empty
+    ;
+
+// Expressions
+r_expr:
+    | STRING_LIT
+    | INT_LIT
+    | l_expr
+    | r_expr '+' r_expr
+    | r_expr '-' r_expr
+    | r_expr '*' r_expr
+    | r_expr '/' r_expr
+    | '-' r_expr
+    | '(' r_expr ')'
+    | r_expr EQUALS r_expr
+    | r_expr ATMOST r_expr
+    | r_expr '<' r_expr
+    | r_expr ATLEAST r_expr
+    | r_expr '>' r_expr
+    | r_expr AND r_expr
+    | r_expr OR r_expr
+    | NOT r_expr
+    | r_expr '.' IDENT '(' actual_args ')'
+    | IDENT '(' actual_args ')'
+    ;
+actual_args:
+    actual_args ',' r_expr
+    | r_expr
     ;
 %%
 
@@ -84,7 +191,7 @@ int main(int argc, char** argv) {
 }
 
 void yyerror(const char *s) {
-        cout << "EEK, parse error! Message: " << s << endl;
+        cout << yylineno << ": EEK, parse error! Message: " << s << endl;
         // might as well halt now:
         exit(-1);
 }

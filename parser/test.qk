@@ -1,2 +1,0 @@
-class Point(x: Int, y: Int) extends Obj
-class Point()
