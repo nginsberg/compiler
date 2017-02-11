@@ -1,6 +1,8 @@
 %{
     #include <cstdio>
     #include <iostream>
+    #include <string.h>
+
     using namespace std;
 
     extern "C" int yylex();
@@ -9,6 +11,7 @@
     extern "C" int yylineno;
 
     void yyerror(const char *s);
+    extern char *yytext;
 %}
 
 %union {
@@ -34,10 +37,15 @@
 %token AND
 %token OR
 %token NOT
+%token IDENT
+%token INT_LIT
+%token STRING_LIT
 
-%token <sval> IDENT
-%token <ival> INT_LIT
-%token <sval> STRING_LIT
+
+%type <sval> IDENT
+%type <sval> ident
+%type <ival> INT_LIT
+%type <sval> STRING_LIT
 
 %%
 // Top level rule
@@ -55,8 +63,8 @@ class:
     class_signature class_body
     ;
 class_signature:
-    CLASS IDENT '(' formal_args ')'
-    | CLASS IDENT '(' formal_args ')' EXTENDS IDENT
+    CLASS ident '(' formal_args ')'
+    | CLASS ident '(' formal_args ')' EXTENDS ident
     ;
 class_body:
     '{' statements methods '}'
@@ -69,7 +77,7 @@ methods:
     | method
     ;
 method:
-    DEF IDENT '(' formal_args ')' return statement_block
+    DEF ident '(' formal_args ')' return statement_block
     ;
 formal_args:
     formal_args ',' formal_arg
@@ -77,11 +85,11 @@ formal_args:
     ;
 formal_arg:
     %empty
-    | IDENT ':' IDENT
+    | ident ':' ident
     ;
 return:
     %empty
-    | ':' IDENT
+    | ':' ident
 
 // Statements
 statements:
@@ -127,8 +135,8 @@ statement:
     l_expr return '=' r_expr ';'
     ;
 l_expr:
-    IDENT
-    | r_expr '.' IDENT
+    ident
+    | r_expr '.' ident
     ;
 
 // Bare Expressions
@@ -160,14 +168,16 @@ r_expr:
     | r_expr AND r_expr
     | r_expr OR r_expr
     | NOT r_expr
-    | r_expr '.' IDENT '(' actual_args ')'
-    | IDENT '(' actual_args ')'
+    | r_expr '.' ident '(' actual_args ')'
+    | ident '(' actual_args ')'
     ;
 actual_args:
     %empty
     | actual_args ',' r_expr
     | r_expr
     ;
+
+ident: IDENT { $$ = strdup(yytext); }
 %%
 
 int main(int argc, char** argv) {
@@ -184,6 +194,7 @@ int main(int argc, char** argv) {
     }
     // set lex to read from it instead of defaulting to STDIN:
     yyin = myfile;
+
 
     // lex through the input:
     do {
