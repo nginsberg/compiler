@@ -143,7 +143,7 @@ statement:
 
 // Expressions
 r_expr:
-    | STRING_LIT
+    STRING_LIT
     | INT_LIT
     | l_expr
     | r_expr '+' r_expr
@@ -164,7 +164,8 @@ r_expr:
     | IDENT '(' actual_args ')'
     ;
 actual_args:
-    actual_args ',' r_expr
+    %empty
+    | actual_args ',' r_expr
     | r_expr
     ;
 %%
