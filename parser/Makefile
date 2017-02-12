@@ -17,7 +17,7 @@ lex.yy.c: quack.l quack.tab.h
 	flex quack.l
 
 parser: lex.yy.c quack.tab.c quack.tab.h $(OBJECTS)
-	g++ -std=c++11 $(OBJECTS) quack.tab.c lex.yy.c -lfl -o parser
+	g++ -std=c++11 $(OBJECTS) quack.tab.c lex.yy.c -lfl -lgc -o parser
 
 clean:
 	$(RM) parser quack.tab.* lex.yy.c $(OBJECTS)

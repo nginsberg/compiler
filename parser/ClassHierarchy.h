@@ -4,7 +4,10 @@
 #include <string>
 #include <iostream>
 
-class ClassSignature {
+#include "gc.h"
+#include "gc_cpp.h"
+
+class ClassSignature : public gc {
 public:
     ClassSignature(std::string c, std::string s): className(c), super(s) {}
     std::string className;

@@ -1,9 +1,14 @@
 %{
     #include <iostream>
     #include <string>
+
     #include "ClassHierarchy.h"
     #include "quack.tab.h"
+    #include "gc.h"
+    #include "gc_cpp.h"
+
     using namespace std;
+
     #define YY_DECL extern "C" int yylex()
     string str;
     void printError(string err);
