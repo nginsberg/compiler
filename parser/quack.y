@@ -1,7 +1,11 @@
 %{
     #include <cstdio>
     #include <iostream>
+    #include <memory>
     #include <string.h>
+    #include <memory>
+
+    #include "ClassHierarchy.h"
 
     using namespace std;
 
@@ -17,6 +21,7 @@
 %union {
     int ival;
     char *sval;
+    ClassSignature *cs;
 }
 
 %define parse.error verbose
@@ -46,6 +51,7 @@
 %type <sval> ident
 %type <ival> INT_LIT
 %type <sval> STRING_LIT
+%type <cs>   class_signature
 
 %%
 // Top level rule
@@ -57,14 +63,19 @@ program:
 classes:
     %empty
     | classes class
-    | class
     ;
 class:
     class_signature class_body
     ;
 class_signature:
-    CLASS ident '(' formal_args ')'
-    | CLASS ident '(' formal_args ')' EXTENDS ident
+    CLASS ident '(' formal_args ')' {
+        $$ = new ClassSignature($2, "Obj");
+        cout << *$$ << endl;
+    }
+    | CLASS ident '(' formal_args ')' EXTENDS ident {
+        $$ = new ClassSignature($2, $7);
+        cout << *$$ << endl;
+    }
     ;
 class_body:
     '{' statements methods '}'
