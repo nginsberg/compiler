@@ -43,6 +43,7 @@ scanner
 parser/parser
 gTest
 out
+*.output
 
 *.tab.h
 *.tab.c

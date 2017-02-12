@@ -25,8 +25,13 @@
 }
 
 %define parse.error verbose
+%left EQUALS
+%left AND OR NOT
+%left ATMOST ATLEAST '<' '>'
 %left '+' '-'
-%left '*' '/'
+%left '/' '*'
+%left UNARY
+%left '.'
 
 %token CLASS
 %token DEF
@@ -85,7 +90,6 @@ class_body:
 methods:
     %empty
     | methods method
-    | method
     ;
 method:
     DEF ident '(' formal_args ')' return statement_block
@@ -104,8 +108,8 @@ return:
 
 // Statements
 statements:
-    statements statement
-    | statement
+    %empty
+    | statements statement
     ;
 statement_block:
     '{' statements '}'
@@ -119,7 +123,6 @@ statement:
 elifs:
     %empty
     | elifs elif
-    | elif
     ;
 elif:
     ELIF r_expr statement_block
@@ -155,11 +158,6 @@ statement:
     r_expr ';'
     ;
 
-// Empty
-statement:
-    %empty
-    ;
-
 // Expressions
 r_expr:
     STRING_LIT
@@ -167,9 +165,9 @@ r_expr:
     | l_expr
     | r_expr '+' r_expr
     | r_expr '-' r_expr
-    | r_expr '*' r_expr
+    | '-' r_expr %prec UNARY
     | r_expr '/' r_expr
-    | '-' r_expr
+    | r_expr '*' r_expr
     | '(' r_expr ')'
     | r_expr EQUALS r_expr
     | r_expr ATMOST r_expr
