@@ -227,11 +227,13 @@ int main(int argc, char** argv) {
         yyparse();
     } while (!feof(yyin));
 
-    cout << "Done, Classes:" << endl << *cls << endl;
+    cout << *cls << endl;
+    ClassTreeNode classHierarchy(*cls);
+    cout << classHierarchy << endl;
 }
 
 void yyerror(const char *s) {
-        cout << yylineno << ": EEK, parse error! Message: " << s << endl;
+        cout << yylineno << ": Error: " << s << endl;
         // might as well halt now:
         exit(-1);
 }
