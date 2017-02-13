@@ -4,6 +4,8 @@
     #include <memory>
     #include <string.h>
     #include <memory>
+    #include <vector>
+    #include <utility>
 
     #include "ClassHierarchy.h"
     #include "gc.h"
@@ -18,12 +20,16 @@
 
     void yyerror(const char *s);
     extern char *yytext;
+
+    Classes *cls;
 %}
 
 %union {
     int ival;
     char *sval;
     ClassSignature *cs;
+    Class *cl;
+    Classes *cls;
 }
 
 %define parse.error verbose
@@ -54,34 +60,43 @@
 %token STRING_LIT
 
 
-%type <sval> IDENT
 %type <sval> ident
 %type <ival> INT_LIT
 %type <sval> STRING_LIT
 %type <cs>   class_signature
+%type <cl>   class
+%type <cls>  classes
 
 %%
 // Top level rule
 program:
-    classes statements { cout << "Finished parse with no errors" << endl; }
+    classes statements
     ;
 
 // Classes
 classes:
-    %empty
-    | classes class
+    %empty {
+        $$ = new Classes();
+    }
+    | classes class {
+        Classes *cls = $1;
+        pair<string, string> newEntry($2->cs.className, $2->cs.super);
+        cls->classTable.push_back(newEntry);
+        $$ = cls;
+        ::cls = cls;
+    }
     ;
 class:
-    class_signature class_body
+    class_signature class_body {
+        $$ = new Class(*$1);
+    }
     ;
 class_signature:
     CLASS ident '(' formal_args ')' {
         $$ = new ClassSignature($2, "Obj");
-        cout << *$$ << endl;
     }
     | CLASS ident '(' formal_args ')' EXTENDS ident {
         $$ = new ClassSignature($2, $7);
-        cout << *$$ << endl;
     }
     ;
 class_body:
@@ -211,6 +226,8 @@ int main(int argc, char** argv) {
     do {
         yyparse();
     } while (!feof(yyin));
+
+    cout << "Done, Classes:" << endl << *cls << endl;
 }
 
 void yyerror(const char *s) {

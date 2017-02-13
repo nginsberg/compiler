@@ -3,6 +3,8 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
+#include <utility>
 
 #include "gc.h"
 #include "gc_cpp.h"
@@ -15,5 +17,20 @@ public:
 };
 
 std::ostream &operator<<(std::ostream &os, const ClassSignature &cs);
+
+class Class : public gc {
+public:
+    Class(const ClassSignature &in): cs(in) {}
+    ClassSignature cs;
+};
+
+std::ostream &operator<<(std::ostream &os, const Class &c);
+
+class Classes : public gc {
+public:
+    std::vector<std::pair<std::string, std::string>> classTable;
+};
+
+std::ostream &operator<<(std::ostream &os, const Classes &cls);
 
 #endif
