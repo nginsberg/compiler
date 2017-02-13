@@ -48,3 +48,4 @@ out
 *.tab.h
 *.tab.c
 samples/
+*.png
