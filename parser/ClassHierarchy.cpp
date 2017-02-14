@@ -128,7 +128,17 @@ ostream &operator<<(ostream &os, const ClassTreeNode &ctn) {
     return os;
 }
 
-
+void makeSureTableIsEmpty(const Classes &cls) {
+    if (!cls.classTable.empty()) {
+        for_each(cls.classTable.begin(), cls.classTable.end(),
+            [] (pair<string, string> cl) {
+                cerr << "Error: Unable to attatch " << cl.first << " to the "
+                    << "class hierarchy. Did you forget to define its "
+                    << "superclass, " << cl.second << "?" << endl;
+            });
+        exit(-1);
+    }
+}
 
 
 

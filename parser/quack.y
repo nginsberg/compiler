@@ -227,9 +227,11 @@ int main(int argc, char** argv) {
         yyparse();
     } while (!feof(yyin));
 
-    cout << *cls << endl;
     ClassTreeNode classHierarchy(*cls);
     cout << classHierarchy << endl;
+    makeSureTableIsEmpty(*cls); // Everything should be in classHierarchy
+
+    return 0;
 }
 
 void yyerror(const char *s) {

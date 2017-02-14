@@ -49,4 +49,6 @@ public:
 
 std::ostream &operator<<(std::ostream &os, const ClassTreeNode &ctn);
 
+void makeSureTableIsEmpty(const Classes &cls);
+
 #endif
