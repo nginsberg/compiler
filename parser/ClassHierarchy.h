@@ -5,6 +5,7 @@
 #include <iostream>
 #include <list>
 #include <utility>
+#include <vector>
 
 #include "gc.h"
 #include "gc_cpp.h"
@@ -13,9 +14,11 @@
 
 class ClassSignature : public gc {
 public:
-    ClassSignature(std::string c, std::string s): className(c), super(s) {}
+    ClassSignature(std::string c, std::string s, int l): className(c),
+        super(s), line(l) {}
     std::string className;
     std::string super;
+    int line;
 };
 
 std::ostream &operator<<(std::ostream &os, const ClassSignature &cs);
@@ -30,7 +33,7 @@ std::ostream &operator<<(std::ostream &os, const Class &c);
 
 class Classes : public gc {
 public:
-    std::list<std::pair<std::string, std::string>> classTable;
+    std::list<std::pair<std::pair<std::string, std::string>, int>> classTable;
 };
 
 std::ostream &operator<<(std::ostream &os, const Classes &cls);
@@ -43,6 +46,9 @@ public:
     // if the class hierarchy is valid.
     ClassTreeNode(Classes &cls);
     ClassTreeNode(std::string name): className(name) {}
+
+    bool makeSureClassExists(const std::string &name);
+
     std::list<ClassTreeNode *> subclasses;
     std::string className;
 };

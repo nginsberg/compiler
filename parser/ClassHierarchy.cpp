@@ -22,9 +22,9 @@ ostream &operator<<(ostream &os, const Class &c) {
 
 ostream &operator<<(ostream &os, const Classes &cls) {
     for_each(cls.classTable.begin(), cls.classTable.end(),
-        [&] (pair<string, string> entry) {
-            os << "Class: " << entry.first << " Superclass: " << entry.second
-                << endl;
+        [&] (pair<pair<string, string>, int> entry) {
+            os << "Class: " << entry.first.first << " Superclass: "
+                << entry.first.second << endl;
         });
     return os;
 }
@@ -45,34 +45,35 @@ ClassTreeNode::ClassTreeNode(Classes &cls) {
     // First we check to make sure no class is defined multiple times
     vector<string> classes;
     for_each(cls.classTable.begin(), cls.classTable.end(),
-        [&] (pair<string, string> entry) {
-            if (count(classes.begin(), classes.end(), entry.first) > 0) {
-                cerr << "Error: Multiple definitions of class " << entry.first
-                    << ". Classes must only be defined once." << endl;
+        [&] (pair<pair<string, string>, int> entry) {
+            if (count(classes.begin(), classes.end(), entry.first.first) > 0) {
+                cerr << "Error: " << entry.second << ": Multiple definitions "
+                    << "of class " << entry.first.first << ". Classes must "
+                    << "only be defined once." << endl;
                 exit(-1);
             }
-            if (entry.first == "Obj") {
-                cerr << "Error: Obj is a predefined class and cannot be redefined."
-                    << endl;
+            if (entry.first.first == "Obj") {
+                cerr << "Error: " << entry.second << ": Obj is a predefined "
+                    << "class and cannot be redefined." << endl;
                 exit(-1);
             }
-            if (entry.first == "Nothing") {
-                cerr << "Error: Nothing is a predefined class and cannot be redefined."
-                    << endl;
+            if (entry.first.first == "Nothing") {
+                cerr << "Error: " << entry.second << ": Nothing is a predefined "
+                    << "class and cannot be redefined." << endl;
                 exit(-1);
             }
-            if (entry.first == "Int") {
-                cerr << "Error: Int is a predefined class and cannot be redefined."
-                    << endl;
+            if (entry.first.first == "Int") {
+                cerr << "Error: " << entry.second << ": Int is a predefined "
+                    << "class and cannot be redefined." << endl;
                 exit(-1);
             }
-            if (entry.first == "String") {
-                cerr << "Error: String is a predefined class and cannot be redefined."
-                    << endl;
+            if (entry.first.first == "String") {
+                cerr << "Error: " << entry.second << ": String is a predefined "
+                    << "class and cannot be redefined." << endl;
                 exit(-1);
             }
 
-            classes.push_back(entry.first);
+            classes.push_back(entry.first.first);
         });
 
     // Now we actually build the tree. The plan is to start at the root, and
@@ -94,9 +95,9 @@ ClassTreeNode::ClassTreeNode(Classes &cls) {
         for (auto iter = cls.classTable.begin(); iter != cls.classTable.end();
             ++iter) {
             // Check if we've found something that inherits from us
-            if (current->className == iter->second) {
+            if (current->className == iter->first.second) {
                 // Create a new node
-                ClassTreeNode *currentClass = new ClassTreeNode(iter->first);
+                ClassTreeNode *currentClass = new ClassTreeNode(iter->first.first);
                 // Add it as a subclass
                 current->subclasses.push_back(currentClass);
                 nodesToSearch.push(currentClass); // Add it to search
@@ -128,25 +129,32 @@ ostream &operator<<(ostream &os, const ClassTreeNode &ctn) {
     return os;
 }
 
+// BFS until we find the right class or search the whole tree
+bool ClassTreeNode::makeSureClassExists(const string &name) {
+    queue<ClassTreeNode *> toSearch;
+    toSearch.push(this);
+
+    while(!toSearch.empty()) {
+        ClassTreeNode *current = toSearch.front();
+        toSearch.pop();
+        if (current->className == name) { return true; }
+        for_each(current->subclasses.begin(), current->subclasses.end(),
+            [&] (ClassTreeNode * ctn) {
+                toSearch.push(ctn);
+            });
+    }
+    return false;
+}
+
 void makeSureTableIsEmpty(const Classes &cls) {
     if (!cls.classTable.empty()) {
         for_each(cls.classTable.begin(), cls.classTable.end(),
-            [] (pair<string, string> cl) {
-                cerr << "Error: Unable to attatch " << cl.first << " to the "
-                    << "class hierarchy. Did you forget to define its "
-                    << "superclass, " << cl.second << "?" << endl;
+            [] (pair<pair<string, string>, int> cl) {
+                cerr << "Error: " << cl.second << ": Unable to attatch "
+                    << cl.first.first << " to the class hierarchy. Did you "
+                    << "forget to define its superclass, " << cl.first.second
+                    << "?" << endl;
             });
         exit(-1);
     }
 }
-
-
-
-
-
-
-
-
-
-
-

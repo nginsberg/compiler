@@ -6,6 +6,7 @@
     #include <memory>
     #include <vector>
     #include <utility>
+    #include <algorithm>
 
     #include "ClassHierarchy.h"
     #include "gc.h"
@@ -22,6 +23,14 @@
     extern char *yytext;
 
     Classes *cls;
+
+    // Clearly this is not how this will be done in the future - this will
+    // need to be a tree representing the rest of the grammar, very similar
+    // to, if not including, the current class hierarchy tree. I'm going to
+    // build that tree once I have a better idea of what it's going to be used
+    // for, and for now I'm just going to pull out all the constructor calls
+    // and check them against my class hierarchy tree.
+    list<pair<string, int>> constructorCalls;
 %}
 
 %union {
@@ -81,7 +90,8 @@ classes:
     | classes class {
         Classes *cls = $1;
         pair<string, string> newEntry($2->cs.className, $2->cs.super);
-        cls->classTable.push_back(newEntry);
+        pair<pair<string, string>, int> newEntryWithLineNo(newEntry, $2->cs.line);
+        cls->classTable.push_back(newEntryWithLineNo);
         $$ = cls;
         ::cls = cls;
     }
@@ -93,10 +103,10 @@ class:
     ;
 class_signature:
     CLASS ident '(' formal_args ')' {
-        $$ = new ClassSignature($2, "Obj");
+        $$ = new ClassSignature($2, "Obj", yylineno);
     }
     | CLASS ident '(' formal_args ')' EXTENDS ident {
-        $$ = new ClassSignature($2, $7);
+        $$ = new ClassSignature($2, $7, yylineno);
     }
     ;
 class_body:
@@ -195,7 +205,9 @@ r_expr:
     | r_expr OR r_expr
     | NOT r_expr
     | r_expr '.' ident '(' actual_args ')'
-    | ident '(' actual_args ')'
+    | ident '(' actual_args ')' {
+        constructorCalls.push_back(pair<string,int>($1, yylineno));
+    }
     ;
 actual_args:
     %empty
@@ -227,10 +239,26 @@ int main(int argc, char** argv) {
         yyparse();
     } while (!feof(yyin));
 
+    // Create class hierarchy, check for well-formedness
     ClassTreeNode classHierarchy(*cls);
-    cout << classHierarchy << endl;
     makeSureTableIsEmpty(*cls); // Everything should be in classHierarchy
 
+    // Check constructor calls
+    bool hadBadConstructor = false;
+    for_each(constructorCalls.begin(), constructorCalls.end(),
+        [&] (pair<string,int> call) {
+            bool isValid = classHierarchy.makeSureClassExists(call.first);
+            if (!isValid) {
+                cerr << "Error: " << call.second << ": Call to constructor for"
+                << " class " << call.first << " when " << call.first
+                << " was never defined." << endl;
+                hadBadConstructor = true;
+            }
+        });
+    if (hadBadConstructor) { exit(-1); }
+
+    cout << "Finished 'compile' with no errors! (Class hierarchy + constructor"
+        << " calls)" << endl;
     return 0;
 }
 
