@@ -7,6 +7,7 @@
 #include <queue>
 
 #include "ClassHierarchy.h"
+#include "AST.h"
 
 using namespace std;
 
@@ -17,7 +18,10 @@ ostream &operator<<(ostream &os, const ClassSignature &cs) {
 }
 
 ostream &operator<<(ostream &os, const Class &c) {
-    return os << c.cs;
+    os << "Class Signature:" << endl;
+    os << c.cs << endl;
+    os << "Class Body:" << endl;
+    return os << c.cb << endl;
 }
 
 ostream &operator<<(ostream &os, const Classes &cls) {
@@ -27,6 +31,11 @@ ostream &operator<<(ostream &os, const Classes &cls) {
                 << entry.first.second << endl;
         });
     return os;
+}
+
+ostream &operator<<(ostream &os, const ClassBody &classBody) {
+    os << "Methods:" << endl;
+    return os << classBody.mthds << endl;
 }
 
 /****************************** CLASS TREE ******************************/

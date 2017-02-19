@@ -9,6 +9,7 @@
 
 #include "gc.h"
 #include "gc_cpp.h"
+#include "AST.h"
 
 /****************************** CLASS TABLE ******************************/
 
@@ -23,10 +24,19 @@ public:
 
 std::ostream &operator<<(std::ostream &os, const ClassSignature &cs);
 
+class ClassBody : public gc {
+public:
+    ClassBody(const Methods &ms): mthds(ms) {}
+    Methods mthds;
+};
+
+std::ostream &operator<<(std::ostream &os, const ClassBody &classBody);
+
 class Class : public gc {
 public:
-    Class(const ClassSignature &in): cs(in) {}
+    Class(const ClassSignature &sig, const ClassBody &bod): cs(sig), cb(bod) {}
     ClassSignature cs;
+    ClassBody cb;
 };
 
 std::ostream &operator<<(std::ostream &os, const Class &c);

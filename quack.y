@@ -9,6 +9,7 @@
     #include <algorithm>
 
     #include "ClassHierarchy.h"
+    #include "AST.h"
     #include "gc.h"
     #include "gc_cpp.h"
 
@@ -36,9 +37,14 @@
 %union {
     int ival;
     char *sval;
+
     ClassSignature *cs;
     Class *cl;
     Classes *cls;
+    ClassBody *cb;
+
+    Method *mthd;
+    Methods *mthds;
 }
 
 %define parse.error verbose
@@ -69,12 +75,17 @@
 %token STRING_LIT
 
 
-%type <sval> ident
-%type <ival> INT_LIT
-%type <sval> STRING_LIT
-%type <cs>   class_signature
-%type <cl>   class
-%type <cls>  classes
+%type <sval>  ident
+%type <ival>  INT_LIT
+%type <sval>  STRING_LIT
+
+%type <cs>    class_signature
+%type <cl>    class
+%type <cls>   classes
+%type <cb>    class_body
+
+%type <mthd>  method
+%type <mthds> methods
 
 %%
 // Top level rule
@@ -98,7 +109,8 @@ classes:
     ;
 class:
     class_signature class_body {
-        $$ = new Class(*$1);
+        $$ = new Class(*$1, *$2);
+        cout << *$$ << endl;
     }
     ;
 class_signature:
@@ -110,16 +122,26 @@ class_signature:
     }
     ;
 class_body:
-    '{' statements methods '}'
+    '{' statements methods '}' {
+        $$ = new ClassBody(*$3);
+    }
     ;
 
 // Methods
 methods:
-    %empty
-    | methods method
+    %empty {
+        $$ = new Methods();
+    }
+    | methods method {
+        Methods *mthds = $1;
+        mthds->methods.push_back(*$2);
+        $$ = mthds;
+    }
     ;
 method:
-    DEF ident '(' formal_args ')' return statement_block
+    DEF ident '(' formal_args ')' return statement_block {
+        $$ = new Method($2);
+    }
     ;
 formal_args:
     formal_args ',' formal_arg
