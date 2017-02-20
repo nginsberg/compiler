@@ -25,11 +25,8 @@ ostream &operator<<(ostream &os, const Class &c) {
 }
 
 ostream &operator<<(ostream &os, const Classes &cls) {
-    for_each(cls.classTable.begin(), cls.classTable.end(),
-        [&] (pair<pair<string, string>, int> entry) {
-            os << "Class: " << entry.first.first << " Superclass: "
-                << entry.first.second << endl;
-        });
+    for_each(cls.classes.begin(), cls.classes.end(),
+        [&] (Class entry) { os << entry << endl; });
     return os;
 }
 
@@ -42,47 +39,55 @@ ostream &operator<<(ostream &os, const ClassBody &classBody) {
 
 ClassTreeNode::ClassTreeNode(Classes &cls) {
     this->className = "Obj"; // We are root
+    this->line = 0;
 
     // Add default subclasses
-    ClassTreeNode *nothing = new ClassTreeNode("Nothing");
+    ClassTreeNode *nothing = new ClassTreeNode("Nothing", 0, Methods());
     this->subclasses.push_back(nothing);
-    ClassTreeNode *intClass = new ClassTreeNode("Int");
+    ClassTreeNode *intClass = new ClassTreeNode("Int", 0, Methods());
     this->subclasses.push_back(intClass);
-    ClassTreeNode *stringClass = new ClassTreeNode("String");
+    ClassTreeNode *stringClass = new ClassTreeNode("String", 0, Methods());
     this->subclasses.push_back(stringClass);
+    ClassTreeNode *boolClass = new ClassTreeNode("Boolean", 0, Methods());
+    this->subclasses.push_back(boolClass);
 
     // First we check to make sure no class is defined multiple times
     vector<string> classes;
-    for_each(cls.classTable.begin(), cls.classTable.end(),
-        [&] (pair<pair<string, string>, int> entry) {
-            if (count(classes.begin(), classes.end(), entry.first.first) > 0) {
-                cerr << "Error: " << entry.second << ": Multiple definitions "
-                    << "of class " << entry.first.first << ". Classes must "
+    for_each(cls.classes.begin(), cls.classes.end(),
+        [&] (Class entry) {
+            if (count(classes.begin(), classes.end(), entry.cs.className) > 0) {
+                cerr << "Error: " << entry.cs.line << ": Multiple definitions "
+                    << "of class " << entry.cs.className << ". Classes must "
                     << "only be defined once." << endl;
                 exit(-1);
             }
-            if (entry.first.first == "Obj") {
-                cerr << "Error: " << entry.second << ": Obj is a predefined "
+            if (entry.cs.className == "Obj") {
+                cerr << "Error: " << entry.cs.line << ": Obj is a predefined "
                     << "class and cannot be redefined." << endl;
                 exit(-1);
             }
-            if (entry.first.first == "Nothing") {
-                cerr << "Error: " << entry.second << ": Nothing is a predefined "
+            if (entry.cs.className == "Nothing") {
+                cerr << "Error: " << entry.cs.line << ": Nothing is a predefined "
                     << "class and cannot be redefined." << endl;
                 exit(-1);
             }
-            if (entry.first.first == "Int") {
-                cerr << "Error: " << entry.second << ": Int is a predefined "
+            if (entry.cs.className == "Int") {
+                cerr << "Error: " << entry.cs.line << ": Int is a predefined "
                     << "class and cannot be redefined." << endl;
                 exit(-1);
             }
-            if (entry.first.first == "String") {
-                cerr << "Error: " << entry.second << ": String is a predefined "
+            if (entry.cs.className == "String") {
+                cerr << "Error: " << entry.cs.line << ": String is a predefined "
+                    << "class and cannot be redefined." << endl;
+                exit(-1);
+            }
+            if (entry.cs.className == "Boolean") {
+                cerr << "Error: " << entry.cs.line << ": Boolean is a predefined "
                     << "class and cannot be redefined." << endl;
                 exit(-1);
             }
 
-            classes.push_back(entry.first.first);
+            classes.push_back(entry.cs.className);
         });
 
     // Now we actually build the tree. The plan is to start at the root, and
@@ -101,16 +106,16 @@ ClassTreeNode::ClassTreeNode(Classes &cls) {
         nodesToSearch.pop(); // Remove it from the queue
         string name = current->className; // Our name
         // Go through the table.
-        for (auto iter = cls.classTable.begin(); iter != cls.classTable.end();
+        for (auto iter = cls.classes.begin(); iter != cls.classes.end();
             ++iter) {
             // Check if we've found something that inherits from us
-            if (current->className == iter->first.second) {
+            if (current->className == iter->cs.super) {
                 // Create a new node
-                ClassTreeNode *currentClass = new ClassTreeNode(iter->first.first);
+                ClassTreeNode *currentClass = new ClassTreeNode(iter->cs.className, iter->cs.line, iter->cb.mthds);
                 // Add it as a subclass
                 current->subclasses.push_back(currentClass);
                 nodesToSearch.push(currentClass); // Add it to search
-                iter = cls.classTable.erase(iter); // Remove it from the table
+                iter = cls.classes.erase(iter); // Remove it from the table
                 --iter; // Since we are about to increment
             }
         }
@@ -121,18 +126,41 @@ ClassTreeNode::ClassTreeNode(Classes &cls) {
 ostream &operator<<(ostream &os, const ClassTreeNode &ctn) {
     os << "digraph {" << endl;
 
+    string nodes = "";
+    string edges = "";
     queue<const ClassTreeNode *>toPrint;
     toPrint.push(&ctn);
     while(!toPrint.empty()) {
         const ClassTreeNode *current = toPrint.front();
         toPrint.pop();
+
+        // Add class node
+        nodes += "\t\t" + current->className + " [label=\"" + \
+            current->className + ": " + to_string(current->line) + "\"]\n";
+
+        // Add method nodes and an edge from class to methods
+        for_each(current->methods.methods.begin(), current->methods.methods.end(),
+            [&] (Method m) {
+            nodes += "\t\t" + current->className + "_" + m.name + \
+                "[shape=box label=\"" + current->className + "." + m.name + \
+                ": " + to_string(m.line) + "\"]\n";
+            edges += "\t" + current->className + " -> " \
+                + current->className + "_" + m.name + "\n";
+        });
+
         for_each(current->subclasses.begin(), current->subclasses.end(),
             [&] (ClassTreeNode *subclass) {
-                os << "\t" << current->className << " -> "
-                    << subclass->className << endl;
+                // Add edge from class to subclass
+                edges += "\t" + current->className + " -> " \
+                    + subclass->className + "\n";
                 toPrint.push(subclass);
             });
     }
+
+    os << "\t{" << endl;
+    os << nodes << endl;
+    os << "\t}" << endl;
+    os << edges << endl;
 
     os << "}" << endl;
     return os;
@@ -156,12 +184,12 @@ bool ClassTreeNode::makeSureClassExists(const string &name) {
 }
 
 void makeSureTableIsEmpty(const Classes &cls) {
-    if (!cls.classTable.empty()) {
-        for_each(cls.classTable.begin(), cls.classTable.end(),
-            [] (pair<pair<string, string>, int> cl) {
-                cerr << "Error: " << cl.second << ": Unable to attatch "
-                    << cl.first.first << " to the class hierarchy. Did you "
-                    << "forget to define its superclass, " << cl.first.second
+    if (!cls.classes.empty()) {
+        for_each(cls.classes.begin(), cls.classes.end(),
+            [] (Class cl) {
+                cerr << "Error: " << cl.cs.line << ": Unable to attatch "
+                    << cl.cs.className << " to the class hierarchy. Did you "
+                    << "forget to define its superclass, " << cl.cs.super
                     << "?" << endl;
             });
         exit(-1);

@@ -1,8 +1,0 @@
-digraph {
-        Obj -> Nothing
-        Obj -> Int
-        Obj -> String
-        Obj -> Pt
-        Obj -> Rect
-        Rect -> Square
-}

@@ -10,8 +10,9 @@
 
 class Method : public gc {
 public:
-    Method(std::string n): name(n) {}
+    Method(std::string n, int l): name(n), line(l) {}
     std::string name;
+    int line;
 };
 
 std::ostream &operator<<(std::ostream &os, const Method &mthd);

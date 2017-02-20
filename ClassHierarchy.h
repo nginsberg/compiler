@@ -43,7 +43,7 @@ std::ostream &operator<<(std::ostream &os, const Class &c);
 
 class Classes : public gc {
 public:
-    std::list<std::pair<std::pair<std::string, std::string>, int>> classTable;
+    std::list<Class> classes;
 };
 
 std::ostream &operator<<(std::ostream &os, const Classes &cls);
@@ -55,12 +55,16 @@ public:
     // Removes classes from table as it adds them - makes it easy to check
     // if the class hierarchy is valid.
     ClassTreeNode(Classes &cls);
-    ClassTreeNode(std::string name): className(name) {}
+    ClassTreeNode(std::string name, int l, Methods m): className(name),
+        line(l), methods(m) {}
 
     bool makeSureClassExists(const std::string &name);
 
     std::list<ClassTreeNode *> subclasses;
+
     std::string className;
+    int line;
+    Methods methods;
 };
 
 std::ostream &operator<<(std::ostream &os, const ClassTreeNode &ctn);

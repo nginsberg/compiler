@@ -100,9 +100,7 @@ classes:
     }
     | classes class {
         Classes *cls = $1;
-        pair<string, string> newEntry($2->cs.className, $2->cs.super);
-        pair<pair<string, string>, int> newEntryWithLineNo(newEntry, $2->cs.line);
-        cls->classTable.push_back(newEntryWithLineNo);
+        cls->classes.push_back(*$2);
         $$ = cls;
         ::cls = cls;
     }
@@ -110,7 +108,6 @@ classes:
 class:
     class_signature class_body {
         $$ = new Class(*$1, *$2);
-        cout << *$$ << endl;
     }
     ;
 class_signature:
@@ -140,7 +137,7 @@ methods:
     ;
 method:
     DEF ident '(' formal_args ')' return statement_block {
-        $$ = new Method($2);
+        $$ = new Method($2, yylineno);
     }
     ;
 formal_args:
@@ -263,6 +260,7 @@ int main(int argc, char** argv) {
 
     // Create class hierarchy, check for well-formedness
     ClassTreeNode classHierarchy(*cls);
+    cout << classHierarchy << endl;
     makeSureTableIsEmpty(*cls); // Everything should be in classHierarchy
 
     // Check constructor calls
