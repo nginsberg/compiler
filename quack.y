@@ -78,9 +78,12 @@
 
 
 %type <sval>  ident
+%type <sval>  string_lit
+%type <ival>  int_lit
+%type <sval>  l_expr
+%type <sval>  r_expr
+%type <sval>  actual_args
 %type <sval>  return
-%type <ival>  INT_LIT
-%type <sval>  STRING_LIT
 
 %type <cs>    class_signature
 %type <cl>    class
@@ -211,11 +214,18 @@ optional_r_expr:
 
 // Assignment
 statement:
-    l_expr return '=' r_expr ';'
+    l_expr '=' r_expr ';'
     ;
 l_expr:
-    ident
-    | r_expr '.' ident
+    ident {
+        $$ = $1;
+    }
+    | r_expr '.' ident {
+        string ret = $1;
+        ret += ".";
+        ret += $3;
+        $$ = ret.c_str();
+    }
     ;
 
 // Bare Expressions
@@ -225,35 +235,134 @@ statement:
 
 // Expressions
 r_expr:
-    STRING_LIT
-    | INT_LIT
-    | l_expr
-    | r_expr '+' r_expr
-    | r_expr '-' r_expr
-    | '-' r_expr %prec UNARY
-    | r_expr '/' r_expr
-    | r_expr '*' r_expr
-    | '(' r_expr ')'
-    | r_expr EQUALS r_expr
-    | r_expr ATMOST r_expr
-    | r_expr '<' r_expr
-    | r_expr ATLEAST r_expr
-    | r_expr '>' r_expr
-    | r_expr AND r_expr
-    | r_expr OR r_expr
-    | NOT r_expr
-    | r_expr '.' ident '(' actual_args ')'
+    string_lit {
+        $$ = $1;
+    }
+    | int_lit {
+        $$ = to_string($1).c_str();
+    }
+    | l_expr {
+        $$ = $1;
+    }
+    | r_expr '+' r_expr {
+        string ret = $1;
+        ret += '+';
+        ret += $3;
+        $$ = ret.c_str();
+    }
+    | r_expr '-' r_expr {
+        string ret = $1;
+        ret += "-";
+        ret += $3;
+        $$ = ret.c_str();
+    }
+    | '-' r_expr %prec UNARY {
+        string ret = "-";
+        ret += $2;
+        $$ = ret.c_str();
+    }
+    | r_expr '/' r_expr {
+        string ret = $1;
+        ret += "/";
+        ret += $3;
+        $$ = ret.c_str();
+    }
+    | r_expr '*' r_expr {
+        string ret = $1;
+        ret += "*";
+        ret += $3;
+        $$ = ret.c_str();
+    }
+    | '(' r_expr ')' {
+        string ret = "(";
+        ret += $2;
+        ret += ")";
+        $$ = ret.c_str();
+    }
+    | r_expr EQUALS r_expr {
+        string ret = $1;
+        ret += "==";
+        ret += $3;
+        $$ = ret.c_str();
+    }
+    | r_expr ATMOST r_expr {
+        string ret = $1;
+        ret += "<=";
+        ret += $3;
+        $$ = ret.c_str();
+    }
+    | r_expr '<' r_expr {
+        string ret = $1;
+        ret += "<";
+        ret += $3;
+        $$ = ret.c_str();
+    }
+    | r_expr ATLEAST r_expr {
+        string ret = $1;
+        ret += ">=";
+        ret += $3;
+        $$ = ret.c_str();
+    }
+    | r_expr '>' r_expr {
+        string ret = $1;
+        ret += ">";
+        ret += $3;
+        $$ = ret.c_str();
+    }
+    | r_expr AND r_expr {
+        string ret = $1;
+        ret += " AND ";
+        ret += $3;
+        $$ = ret.c_str();
+    }
+    | r_expr OR r_expr {
+        string ret = $1;
+        ret += " OR ";
+        ret += $3;
+        $$ = ret.c_str();
+    }
+    | NOT r_expr {
+        string ret = "NOT ";
+        ret += $2;
+        $$ = ret.c_str();
+    }
+    | r_expr '.' ident '(' actual_args ')' {
+        string ret = $1;
+        ret += ".";
+        ret += $3;
+        ret += "(";
+        ret += $5;
+        ret += ")";
+        $$ = ret.c_str();
+    }
     | ident '(' actual_args ')' {
         constructorCalls.push_back(pair<string,int>($1, yylineno));
+
+        string ret = $1;
+        ret += "(";
+        ret += $3;
+        ret += ")";
+        $$ = ret.c_str();
     }
     ;
 actual_args:
-    %empty
-    | actual_args ',' r_expr
-    | r_expr
+    %empty {
+        $$ = "";
+    }
+    | actual_args ',' r_expr {
+        string ret = $1;
+        ret += ", ";
+        ret += $3;
+        $$ = ret.c_str();
+    }
+    | r_expr {
+        $$ = $1;
+    }
     ;
 
 ident: IDENT { $$ = strdup(yytext); }
+string_lit: STRING_LIT { $$ = strdup(yytext); }
+int_lit: INT_LIT { $$ = atoi(yytext); }
 %%
 
 int main(int argc, char** argv) {
