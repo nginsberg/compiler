@@ -1,5 +1,5 @@
-SOURCES = ClassHierarchy.cpp AST.cpp
-HEADERS = ClassHierarchy.h AST.h
+SOURCES = ClassHierarchy.cpp Methods.cpp
+HEADERS = ClassHierarchy.h Methods.h
 OBJECTS = $(SOURCES:.cpp=.o)
 LIBS = -lfl
 CC = g++

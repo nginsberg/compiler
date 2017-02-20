@@ -3,7 +3,7 @@
     #include <string>
 
     #include "ClassHierarchy.h"
-    #include "AST.h"
+    #include "Methods.h"
     #include "quack.tab.h"
     #include "gc.h"
     #include "gc_cpp.h"

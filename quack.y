@@ -9,7 +9,7 @@
     #include <algorithm>
 
     #include "ClassHierarchy.h"
-    #include "AST.h"
+    #include "Methods.h"
     #include "gc.h"
     #include "gc_cpp.h"
 
@@ -36,7 +36,7 @@
 
 %union {
     int ival;
-    char *sval;
+    const char *sval;
 
     ClassSignature *cs;
     Class *cl;
@@ -45,6 +45,8 @@
 
     Method *mthd;
     Methods *mthds;
+    FormalArg *fArg;
+    FormalArgs *fArgs;
 }
 
 %define parse.error verbose
@@ -76,6 +78,7 @@
 
 
 %type <sval>  ident
+%type <sval>  return
 %type <ival>  INT_LIT
 %type <sval>  STRING_LIT
 
@@ -86,6 +89,8 @@
 
 %type <mthd>  method
 %type <mthds> methods
+%type <fArg>  formal_arg
+%type <fArgs> formal_args
 
 %%
 // Top level rule
@@ -112,10 +117,10 @@ class:
     ;
 class_signature:
     CLASS ident '(' formal_args ')' {
-        $$ = new ClassSignature($2, "Obj", yylineno);
+        $$ = new ClassSignature($2, *$4, "Obj", yylineno);
     }
     | CLASS ident '(' formal_args ')' EXTENDS ident {
-        $$ = new ClassSignature($2, $7, yylineno);
+        $$ = new ClassSignature($2, *$4, $7, yylineno);
     }
     ;
 class_body:
@@ -137,20 +142,34 @@ methods:
     ;
 method:
     DEF ident '(' formal_args ')' return statement_block {
-        $$ = new Method($2, yylineno);
+        $$ = new Method($2, *$4, $6, yylineno);
     }
     ;
 formal_args:
-    formal_args ',' formal_arg
-    | formal_arg
+    %empty {
+        $$ = new FormalArgs();
+    }
+    | formal_arg {
+        $$ = new FormalArgs(*$1);
+    }
+    | formal_args ',' formal_arg {
+        FormalArgs *args = $1;
+        args->fArgs.push_back(*$3);
+        $$ = $1;
+    }
     ;
 formal_arg:
-    %empty
-    | ident ':' ident
+    ident ':' ident {
+        $$ = new FormalArg($1, $3);
+    }
     ;
 return:
-    %empty
-    | ':' ident
+    %empty {
+        $$ = "Nothing";
+    }
+    | ':' ident {
+        $$ = $2;
+    }
 
 // Statements
 statements:

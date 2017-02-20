@@ -9,15 +9,16 @@
 
 #include "gc.h"
 #include "gc_cpp.h"
-#include "AST.h"
+#include "Methods.h"
 
 /****************************** CLASS TABLE ******************************/
 
 class ClassSignature : public gc {
 public:
-    ClassSignature(std::string c, std::string s, int l): className(c),
-        super(s), line(l) {}
+    ClassSignature(std::string c, FormalArgs args, std::string s, int l):
+        className(c), fArgs(args), super(s), line(l) {}
     std::string className;
+    FormalArgs fArgs;
     std::string super;
     int line;
 };
@@ -55,8 +56,8 @@ public:
     // Removes classes from table as it adds them - makes it easy to check
     // if the class hierarchy is valid.
     ClassTreeNode(Classes &cls);
-    ClassTreeNode(std::string name, int l, Methods m): className(name),
-        line(l), methods(m) {}
+    ClassTreeNode(std::string name, FormalArgs args, int l, Methods m):
+        className(name), fArgs(args), line(l), methods(m) {}
 
     bool makeSureClassExists(const std::string &name);
 
@@ -65,6 +66,7 @@ public:
     std::string className;
     int line;
     Methods methods;
+    FormalArgs fArgs;
 };
 
 std::ostream &operator<<(std::ostream &os, const ClassTreeNode &ctn);

@@ -7,7 +7,7 @@
 #include <queue>
 
 #include "ClassHierarchy.h"
-#include "AST.h"
+#include "Methods.h"
 
 using namespace std;
 
@@ -42,13 +42,13 @@ ClassTreeNode::ClassTreeNode(Classes &cls) {
     this->line = 0;
 
     // Add default subclasses
-    ClassTreeNode *nothing = new ClassTreeNode("Nothing", 0, Methods());
+    ClassTreeNode *nothing = new ClassTreeNode("Nothing", FormalArgs(), 0, Methods());
     this->subclasses.push_back(nothing);
-    ClassTreeNode *intClass = new ClassTreeNode("Int", 0, Methods());
+    ClassTreeNode *intClass = new ClassTreeNode("Int", FormalArgs(), 0, Methods());
     this->subclasses.push_back(intClass);
-    ClassTreeNode *stringClass = new ClassTreeNode("String", 0, Methods());
+    ClassTreeNode *stringClass = new ClassTreeNode("String", FormalArgs(), 0, Methods());
     this->subclasses.push_back(stringClass);
-    ClassTreeNode *boolClass = new ClassTreeNode("Boolean", 0, Methods());
+    ClassTreeNode *boolClass = new ClassTreeNode("Boolean", FormalArgs(), 0, Methods());
     this->subclasses.push_back(boolClass);
 
     // First we check to make sure no class is defined multiple times
@@ -111,7 +111,9 @@ ClassTreeNode::ClassTreeNode(Classes &cls) {
             // Check if we've found something that inherits from us
             if (current->className == iter->cs.super) {
                 // Create a new node
-                ClassTreeNode *currentClass = new ClassTreeNode(iter->cs.className, iter->cs.line, iter->cb.mthds);
+                ClassTreeNode *currentClass =
+                    new ClassTreeNode(iter->cs.className, iter->cs.fArgs,
+                        iter->cs.line, iter->cb.mthds);
                 // Add it as a subclass
                 current->subclasses.push_back(currentClass);
                 nodesToSearch.push(currentClass); // Add it to search
@@ -136,14 +138,14 @@ ostream &operator<<(ostream &os, const ClassTreeNode &ctn) {
 
         // Add class node
         nodes += "\t\t" + current->className + " [label=\"" + \
-            current->className + ": " + to_string(current->line) + "\"]\n";
+            current->className + "(" + current->fArgs.toString() + "): " + to_string(current->line) + "\"]\n";
 
         // Add method nodes and an edge from class to methods
         for_each(current->methods.methods.begin(), current->methods.methods.end(),
             [&] (Method m) {
             nodes += "\t\t" + current->className + "_" + m.name + \
                 "[shape=box label=\"" + current->className + "." + m.name + \
-                ": " + to_string(m.line) + "\"]\n";
+                "(" + m.fArgs.toString() + "-> " + m.retType + "): " + to_string(m.line) + "\"]\n";
             edges += "\t" + current->className + " -> " \
                 + current->className + "_" + m.name + "\n";
         });
