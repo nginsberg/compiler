@@ -78,9 +78,9 @@
 
 
 %type <sval>  ident
-%type <sval>  return
-%type <ival>  int_lit
 %type <sval>  string_lit
+%type <ival>  int_lit
+%type <sval>  return
 
 %type <cs>    class_signature
 %type <cl>    class
@@ -211,7 +211,7 @@ optional_r_expr:
 
 // Assignment
 statement:
-    l_expr return '=' r_expr ';'
+    l_expr '=' r_expr ';'
     ;
 l_expr:
     ident

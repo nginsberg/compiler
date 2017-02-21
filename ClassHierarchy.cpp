@@ -138,14 +138,16 @@ ostream &operator<<(ostream &os, const ClassTreeNode &ctn) {
 
         // Add class node
         nodes += "\t\t" + current->className + " [label=\"" + \
-            current->className + "(" + current->fArgs.toString() + "): " + to_string(current->line) + "\"]\n";
+            current->className + "(" + current->fArgs.toString() + "): " + \
+                to_string(current->line) + "\"]\n";
 
         // Add method nodes and an edge from class to methods
         for_each(current->methods.methods.begin(), current->methods.methods.end(),
             [&] (Method m) {
             nodes += "\t\t" + current->className + "_" + m.name + \
                 "[shape=box label=\"" + current->className + "." + m.name + \
-                "(" + m.fArgs.toString() + "-> " + m.retType + "): " + to_string(m.line) + "\"]\n";
+                "(" + m.fArgs.toString() + "-> " + m.retType + "): " + \
+                to_string(m.line) + "\"]\n";
             edges += "\t" + current->className + " -> " \
                 + current->className + "_" + m.name + "\n";
         });
