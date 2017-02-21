@@ -79,8 +79,8 @@
 
 %type <sval>  ident
 %type <sval>  return
-%type <ival>  INT_LIT
-%type <sval>  STRING_LIT
+%type <ival>  int_lit
+%type <sval>  string_lit
 
 %type <cs>    class_signature
 %type <cl>    class
@@ -225,8 +225,8 @@ statement:
 
 // Expressions
 r_expr:
-    STRING_LIT
-    | INT_LIT
+    string_lit
+    | int_lit
     | l_expr
     | r_expr '+' r_expr
     | r_expr '-' r_expr
@@ -254,6 +254,8 @@ actual_args:
     ;
 
 ident: IDENT { $$ = strdup(yytext); }
+int_lit: INT_LIT { $$ = atoi(yytext); }
+string_lit: STRING_LIT { $$ = strdup(yytext); }
 %%
 
 int main(int argc, char** argv) {
@@ -279,7 +281,7 @@ int main(int argc, char** argv) {
 
     // Create class hierarchy, check for well-formedness
     ClassTreeNode classHierarchy(*cls);
-    cout << classHierarchy << endl;
+    // cout << classHierarchy << endl;
     makeSureTableIsEmpty(*cls); // Everything should be in classHierarchy
 
     // Check constructor calls
