@@ -1,7 +1,7 @@
-SOURCES = ClassHierarchy.cpp Methods.cpp
-HEADERS = ClassHierarchy.h Methods.h
+SOURCES = ClassHierarchy.cpp Methods.cpp Expressions.cpp
+HEADERS = ClassHierarchy.h Methods.h Expressions.h
 OBJECTS = $(SOURCES:.cpp=.o)
-LIBS = -lfl
+LIBS = -lfl -lgc
 CC = g++
 CFLAGS = -std=c++11 -g
 
@@ -17,7 +17,7 @@ lex.yy.c: quack.l quack.tab.h
 	flex quack.l
 
 parser: lex.yy.c quack.tab.c quack.tab.h $(OBJECTS)
-	g++ -std=c++11 $(OBJECTS) quack.tab.c lex.yy.c -lfl -lgc -o parser
+	g++ -std=c++11 $(OBJECTS) quack.tab.c lex.yy.c $(LIBS) -o $@
 
 clean:
 	$(RM) parser quack.tab.* lex.yy.c $(OBJECTS)

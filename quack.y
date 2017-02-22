@@ -10,6 +10,7 @@
 
     #include "ClassHierarchy.h"
     #include "Methods.h"
+    #include "Expressions.h"
     #include "gc.h"
     #include "gc_cpp.h"
 
@@ -47,6 +48,10 @@
     Methods *mthds;
     FormalArg *fArg;
     FormalArgs *fArgs;
+
+    RExpr *rexpr;
+    LExpr *lexpr;
+    ActualArgs *aArgs;
 }
 
 %define parse.error verbose
@@ -91,6 +96,10 @@
 %type <mthds> methods
 %type <fArg>  formal_arg
 %type <fArgs> formal_args
+
+%type <rexpr> r_expr
+%type <lexpr> l_expr
+%type <aArgs> actual_args
 
 %%
 // Top level rule
@@ -214,8 +223,12 @@ statement:
     l_expr '=' r_expr ';'
     ;
 l_expr:
-    ident
-    | r_expr '.' ident
+    ident {
+        $$ = new LExpr($1);
+    }
+    | r_expr '.' ident {
+        $$ = new LExpr($1->str + "." + $3);
+    }
     ;
 
 // Bare Expressions
@@ -225,32 +238,77 @@ statement:
 
 // Expressions
 r_expr:
-    string_lit
-    | int_lit
-    | l_expr
-    | r_expr '+' r_expr
-    | r_expr '-' r_expr
-    | '-' r_expr %prec UNARY
-    | r_expr '/' r_expr
-    | r_expr '*' r_expr
-    | '(' r_expr ')'
-    | r_expr EQUALS r_expr
-    | r_expr ATMOST r_expr
-    | r_expr '<' r_expr
-    | r_expr ATLEAST r_expr
-    | r_expr '>' r_expr
-    | r_expr AND r_expr
-    | r_expr OR r_expr
-    | NOT r_expr
-    | r_expr '.' ident '(' actual_args ')'
+    string_lit {
+        $$ = new RExpr($1);
+    }
+    | int_lit {
+        $$ = new RExpr(to_string($1));
+    }
+    | l_expr {
+        $$ = new RExpr($1->str);
+    }
+    | r_expr '+' r_expr {
+        $$ = new RExpr($1->str + " + " + $3->str);
+    }
+    | r_expr '-' r_expr {
+        $$ = new RExpr($1->str + " - " + $3->str);
+    }
+    | '-' r_expr %prec UNARY {
+        $$ = new RExpr("- " + $2->str);
+    }
+    | r_expr '/' r_expr {
+        $$ = new RExpr($1->str + " / " + $3->str);
+    }
+    | r_expr '*' r_expr {
+        $$ = new RExpr($1->str + " * " + $3->str);
+    }
+    | '(' r_expr ')' {
+        $$ = new RExpr("(" + $2->str + ")");
+    }
+    | r_expr EQUALS r_expr {
+        $$ = new RExpr($1->str + " == " + $3->str);
+    }
+    | r_expr ATMOST r_expr {
+        $$ = new RExpr($1->str + " <= " + $3->str);
+    }
+    | r_expr '<' r_expr {
+        $$ = new RExpr($1->str + " < " + $3->str);
+    }
+    | r_expr ATLEAST r_expr {
+        $$ = new RExpr($1->str + " >= " + $3->str);
+    }
+    | r_expr '>' r_expr {
+        $$ = new RExpr($1->str + " > " + $3->str);
+    }
+    | r_expr AND r_expr {
+        $$ = new RExpr($1->str + " AND " + $3->str);
+    }
+    | r_expr OR r_expr {
+        $$ = new RExpr($1->str + " OR " + $3->str);
+    }
+    | NOT r_expr {
+        $$ = new RExpr("NOT " + $2->str);
+    }
+    | r_expr '.' ident '(' actual_args ')' {
+        $$ = new RExpr($1->str + "." + $3 + "(" + $5->str + ")");
+    }
     | ident '(' actual_args ')' {
         constructorCalls.push_back(pair<string,int>($1, yylineno));
+
+        string s = $1;
+        $$ = new RExpr(s + "(" + $3->str + ")");
     }
     ;
 actual_args:
-    %empty
-    | actual_args ',' r_expr
-    | r_expr
+    %empty {
+        $$ = new ActualArgs("");
+    }
+    | actual_args ',' r_expr {
+        $$ = new ActualArgs($1->str + ", " + $3->str);
+    }
+    | r_expr {
+        $$ = new ActualArgs($1->str);
+    }
     ;
 
 ident: IDENT { $$ = strdup(yytext); }
