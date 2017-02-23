@@ -11,6 +11,7 @@
     #include "ClassHierarchy.h"
     #include "Methods.h"
     #include "Expressions.h"
+    #include "Statements.h"
     #include "gc.h"
     #include "gc_cpp.h"
 
@@ -52,6 +53,8 @@
     RExpr *rexpr;
     LExpr *lexpr;
     ActualArgs *aArgs;
+
+    Statement *stmt;
 }
 
 %define parse.error verbose
@@ -100,6 +103,8 @@
 %type <rexpr> r_expr
 %type <lexpr> l_expr
 %type <aArgs> actual_args
+
+%type <stmt>  statement
 
 %%
 // Top level rule
@@ -233,7 +238,10 @@ l_expr:
 
 // Bare Expressions
 statement:
-    r_expr ';'
+    r_expr ';' {
+        $$ = new BareStatement(yylineno, *$1);
+        cout << $$->print() << endl;
+    }
     ;
 
 // Expressions

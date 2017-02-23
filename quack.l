@@ -5,6 +5,7 @@
     #include "ClassHierarchy.h"
     #include "Methods.h"
     #include "Expressions.h"
+    #include "Statements.h"
     #include "quack.tab.h"
     #include "gc.h"
     #include "gc_cpp.h"
