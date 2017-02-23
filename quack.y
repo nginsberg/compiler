@@ -109,6 +109,7 @@
 %type <stmts> statement_block
 %type <stmt>  else
 %type <stmt>  elif
+%type <stmt>  elifs
 
 %%
 // Top level rule
@@ -210,22 +211,36 @@ statement_block:
 statement:
     IF r_expr statement_block
     elifs
-    else
+    else {
+        RExpr *ifTrue = dynamic_cast<RExpr *>$2;
+        Statements *stmts = dynamic_cast<Statements *>$3;
+        Elifs *elifs = dynamic_cast<Elifs *>$4;
+        ElseStatement *el = dynamic_cast<ElseStatement *>$5;
+        $$ = new IfStatement(yylineno, *ifTrue, *stmts, *elifs, *el);
+        cout << $$->print() << endl;
+    }
 elifs:
-    /* empty */
-    | elifs elif
+    /* empty */ {
+        $$ = new Elifs();
+    }
+    | elifs elif {
+        Elifs *es = dynamic_cast<Elifs *>$1;
+        ElifStatement *e = dynamic_cast<ElifStatement *>$2;
+        es->elifs.push_back(*e);
+        $$ = es;
+    }
     ;
 elif:
     ELIF r_expr statement_block {
         $$ = new ElifStatement(yylineno, *$2, *$3);
-        cout << $$->print();
     }
     ;
 else:
-    /* empty */
+    /* empty */ {
+        $$ = new ElseStatement(0, Statements());
+    }
     | ELSE statement_block {
         $$ = new ElseStatement(yylineno, *$2);
-        cout << $$->print() << endl;
     }
     ;
 

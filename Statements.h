@@ -68,4 +68,33 @@ public:
     Statements ss;
 };
 
+class Elifs : public Statement {
+public:
+    Elifs(): Statement(0) {}
+    std::string print() override;
+    std::list<ElifStatement> elifs;
+};
+
+
+class IfStatement : public Statement {
+public:
+    IfStatement(int l, RExpr it, Statements ss, Elifs els, ElseStatement e):
+        Statement(l), ifTrue(it), stmts(ss), elifs(els), el(e) {}
+    std::string print() override;
+    RExpr ifTrue;
+    Statements stmts;
+    Elifs elifs;
+    ElseStatement el;
+};
+
 #endif
+
+
+
+
+
+
+
+
+
+

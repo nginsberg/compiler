@@ -19,6 +19,8 @@ class Pt(x: Int, y: Int) {
       while (this.x < this.y) {
           if (this.x < this.y) {
               this.x = this.x + 1;
+          } elif (this.x + 1 == this.y) {
+              this.x = this.x + 4;
           } elif (this.x == this.y) {
               this.x = this.y;
           } else {

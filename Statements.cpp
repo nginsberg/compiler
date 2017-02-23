@@ -46,3 +46,19 @@ string ElifStatement::print() {
     ret += ss.print();
     return ret;
 }
+
+string Elifs::print() {
+    string ret;
+    for_each(elifs.begin(), elifs.end(), [&] (ElifStatement s) {
+        ret += s.print() + "\n";
+    });
+    return ret;
+}
+
+string IfStatement::print() {
+    string ret = to_string(line) + ": IF (" + ifTrue.str + ") ->\n";
+    ret += stmts.print();
+    ret += elifs.print();
+    ret += el.print();
+    return ret;
+}
