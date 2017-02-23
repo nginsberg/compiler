@@ -1,7 +1,7 @@
 SOURCES = ClassHierarchy.cpp Methods.cpp Expressions.cpp Statements.cpp
 HEADERS = ClassHierarchy.h Methods.h Expressions.h Statements.h
 OBJECTS = $(SOURCES:.cpp=.o)
-LIBS = -lfl -lgc
+LIBS = -ll -lgc
 CC = g++
 CFLAGS = -std=c++11 -g
 

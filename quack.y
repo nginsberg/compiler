@@ -13,7 +13,6 @@
     #include "Expressions.h"
     #include "Statements.h"
     #include "gc.h"
-    #include "gc_cpp.h"
 
     using namespace std;
 
@@ -58,7 +57,6 @@
     Statements *stmts;
 }
 
-%define parse.error verbose
 %left EQUALS
 %left AND OR NOT
 %left ATMOST ATLEAST '<' '>'
@@ -118,7 +116,7 @@ program:
 
 // Classes
 classes:
-    %empty {
+    /* empty */ {
         $$ = new Classes();
     }
     | classes class {
@@ -149,7 +147,7 @@ class_body:
 
 // Methods
 methods:
-    %empty {
+    /* empty */ {
         $$ = new Methods();
     }
     | methods method {
@@ -164,7 +162,7 @@ method:
     }
     ;
 formal_args:
-    %empty {
+    /* empty */ {
         $$ = new FormalArgs();
     }
     | formal_arg {
@@ -182,7 +180,7 @@ formal_arg:
     }
     ;
 return:
-    %empty {
+    /* empty */ {
         $$ = "Nothing";
     }
     | ':' ident {
@@ -191,7 +189,7 @@ return:
 
 // Statements
 statements:
-    %empty {
+    /* empty */ {
         $$ = new Statements();
     }
     | statements statement {
@@ -212,14 +210,14 @@ statement:
     elifs
     else
 elifs:
-    %empty
+    /* empty */
     | elifs elif
     ;
 elif:
     ELIF r_expr statement_block
     ;
 else:
-    %empty
+    /* empty */
     | ELSE statement_block
     ;
 
@@ -236,7 +234,7 @@ statement:
     }
     ;
 optional_r_expr:
-    %empty {
+    /* empty */ {
         $$ = new RExpr("Nothing()");
     }
     | r_expr {
@@ -331,7 +329,7 @@ r_expr:
     }
     ;
 actual_args:
-    %empty {
+    /* empty */ {
         $$ = new ActualArgs("");
     }
     | actual_args ',' r_expr {

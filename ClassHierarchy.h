@@ -8,12 +8,11 @@
 #include <vector>
 
 #include "gc.h"
-#include "gc_cpp.h"
 #include "Methods.h"
 
 /****************************** CLASS TABLE ******************************/
 
-class ClassSignature : public gc {
+class ClassSignature {
 public:
     ClassSignature(std::string c, FormalArgs args, std::string s, int l):
         className(c), fArgs(args), super(s), line(l) {}
@@ -25,7 +24,7 @@ public:
 
 std::ostream &operator<<(std::ostream &os, const ClassSignature &cs);
 
-class ClassBody : public gc {
+class ClassBody {
 public:
     ClassBody(const Methods &ms): mthds(ms) {}
     Methods mthds;
@@ -33,7 +32,7 @@ public:
 
 std::ostream &operator<<(std::ostream &os, const ClassBody &classBody);
 
-class Class : public gc {
+class Class {
 public:
     Class(const ClassSignature &sig, const ClassBody &bod): cs(sig), cb(bod) {}
     ClassSignature cs;
@@ -42,7 +41,7 @@ public:
 
 std::ostream &operator<<(std::ostream &os, const Class &c);
 
-class Classes : public gc {
+class Classes {
 public:
     std::list<Class> classes;
 };
@@ -51,7 +50,7 @@ std::ostream &operator<<(std::ostream &os, const Classes &cls);
 
 /****************************** CLASS TREE ******************************/
 
-class ClassTreeNode : public gc {
+class ClassTreeNode {
 public:
     // Removes classes from table as it adds them - makes it easy to check
     // if the class hierarchy is valid.

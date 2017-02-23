@@ -6,17 +6,16 @@
 #include <list>
 
 #include "gc.h"
-#include "gc_cpp.h"
 #include "Expressions.h"
 
-class Statement : public gc {
+class Statement {
 public:
     Statement(int l): line(l) {}
     int line;
     virtual std::string print() { return ""; }
 };
 
-class Statements : public gc {
+class Statements {
 public:
     std::list<Statement> ss;
     std::string print();
