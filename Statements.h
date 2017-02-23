@@ -17,7 +17,7 @@ public:
 
 class Statements {
 public:
-    std::list<Statement> ss;
+    std::list<Statement *> ss;
     std::string print();
 };
 
@@ -50,6 +50,22 @@ public:
     std::string print() override;
     RExpr ifTrue;
     Statements block;
+};
+
+class ElseStatement : public Statement {
+public:
+    ElseStatement(int l, Statements s): Statement(l), ss(s) {}
+    std::string print() override;
+    Statements ss;
+};
+
+class ElifStatement : public Statement {
+public:
+    ElifStatement(int l, RExpr it, Statements s): Statement(l), ifTrue(it),
+        ss(s) {}
+    std::string print() override;
+    RExpr ifTrue;
+    Statements ss;
 };
 
 #endif

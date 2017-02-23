@@ -107,6 +107,8 @@
 %type <rexpr> optional_r_expr
 %type <stmts> statements
 %type <stmts> statement_block
+%type <stmt>  else
+%type <stmt>  elif
 
 %%
 // Top level rule
@@ -194,7 +196,7 @@ statements:
     }
     | statements statement {
         Statements *stmts = $1;
-        stmts->ss.push_back(*$2);
+        stmts->ss.push_back($2);
         $$ = stmts;
     }
     ;
@@ -214,17 +216,22 @@ elifs:
     | elifs elif
     ;
 elif:
-    ELIF r_expr statement_block
+    ELIF r_expr statement_block {
+        $$ = new ElifStatement(yylineno, *$2, *$3);
+        cout << $$->print();
+    }
     ;
 else:
     /* empty */
-    | ELSE statement_block
+    | ELSE statement_block {
+        $$ = new ElseStatement(yylineno, *$2);
+        cout << $$->print() << endl;
+    }
     ;
 
 statement:
     WHILE r_expr statement_block {
         $$ = new WhileStatement(yylineno, *$2, *$3);
-        cout << $$->print() << endl;
     }
 
 // Return
