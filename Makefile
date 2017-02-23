@@ -2,7 +2,14 @@ SOURCES = ClassHierarchy.cpp Methods.cpp Expressions.cpp Statements.cpp
 HEADERS = ClassHierarchy.h Methods.h Expressions.h Statements.h
 OBJECTS = $(SOURCES:.cpp=.o)
 WARN = -Wno-deprecated-register
+
+OS = $(shell uname)
+ifeq ($(OS), Darwin)
 LIBS = -ll -lgc
+else
+LIBS = -lfl -lgc
+endif
+
 CC = g++
 CFLAGS = -std=c++11 -g
 
