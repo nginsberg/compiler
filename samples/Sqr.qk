@@ -15,6 +15,12 @@ class Pt(x: Int, y: Int) {
       return Pt(this.x + other.x, this.y + other.y);
   }
 
+  def upWhile() {
+      while (this.x < this.y) {
+          this.x = this.x + 1;
+      }
+  }
+
   def _x() : Int { return this.x; }
   def _y() : Int {  return this.y; }
 }

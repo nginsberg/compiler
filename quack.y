@@ -55,6 +55,7 @@
     ActualArgs *aArgs;
 
     Statement *stmt;
+    Statements *stmts;
 }
 
 %define parse.error verbose
@@ -105,6 +106,9 @@
 %type <aArgs> actual_args
 
 %type <stmt>  statement
+%type <rexpr> optional_r_expr
+%type <stmts> statements
+%type <stmts> statement_block
 
 %%
 // Top level rule
@@ -187,11 +191,19 @@ return:
 
 // Statements
 statements:
-    %empty
-    | statements statement
+    %empty {
+        $$ = new Statements();
+    }
+    | statements statement {
+        Statements *stmts = $1;
+        stmts->ss.push_back(*$2);
+        $$ = stmts;
+    }
     ;
 statement_block:
-    '{' statements '}'
+    '{' statements '}' {
+        $$ = $2;
+    }
     ;
 
 // Control structures
@@ -212,21 +224,41 @@ else:
     ;
 
 statement:
-    WHILE r_expr statement_block;
+    WHILE r_expr statement_block {
+        $$ = new WhileStatement(yylineno, *$2, *$3);
+        cout << $$->print() << endl;
+    }
 
 // Return
 statement:
-    RETURN optional_r_expr ';'
+    RETURN optional_r_expr ';' {
+        $$ = new ReturnStatement(yylineno, *$2);
+    }
     ;
 optional_r_expr:
-    %empty
-    | r_expr
+    %empty {
+        $$ = new RExpr("Nothing()");
+    }
+    | r_expr {
+        $$ = $1;
+    }
     ;
 
 // Assignment
 statement:
-    l_expr '=' r_expr ';'
+    l_expr '=' r_expr ';' {
+        $$ = new AssignStatement(yylineno, *$1, *$3);
+    }
     ;
+
+// Bare Expressions
+statement:
+    r_expr ';' {
+        $$ = new BareStatement(yylineno, *$1);
+    }
+    ;
+
+// Expressions
 l_expr:
     ident {
         $$ = new LExpr($1);
@@ -236,15 +268,6 @@ l_expr:
     }
     ;
 
-// Bare Expressions
-statement:
-    r_expr ';' {
-        $$ = new BareStatement(yylineno, *$1);
-        cout << $$->print() << endl;
-    }
-    ;
-
-// Expressions
 r_expr:
     string_lit {
         $$ = new RExpr($1);
