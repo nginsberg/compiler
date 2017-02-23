@@ -1,6 +1,8 @@
 SOURCES = ClassHierarchy.cpp Methods.cpp Expressions.cpp Statements.cpp
 HEADERS = ClassHierarchy.h Methods.h Expressions.h Statements.h
 OBJECTS = $(SOURCES:.cpp=.o)
+DOTS = graph/ast.dot
+GRAPHS = $(DOTS:.dot=.png)
 WARN = -Wno-deprecated-register
 
 OS = $(shell uname)
@@ -16,7 +18,12 @@ CFLAGS = -std=c++11 -g
 %.o: %.cpp
 	$(CC) -c $(CFLAGS) $<
 
+%.png: %.dot
+	dot -T png -O $<
+
 default: parser
+
+graphs: $(GRAPHS)
 
 quack.tab.c quack.tab.h: quack.y
 	bison -d quack.y

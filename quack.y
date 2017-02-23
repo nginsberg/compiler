@@ -145,6 +145,7 @@ class_signature:
 class_body:
     '{' statements methods '}' {
         $$ = new ClassBody(*$3);
+        cout << $2->print(0) << endl;
     }
     ;
 
@@ -217,7 +218,6 @@ statement:
         Elifs *elifs = dynamic_cast<Elifs *>$4;
         ElseStatement *el = dynamic_cast<ElseStatement *>$5;
         $$ = new IfStatement(yylineno, *ifTrue, *stmts, *elifs, *el);
-        cout << $$->print() << endl;
     }
 elifs:
     /* empty */ {
@@ -390,7 +390,7 @@ int main(int argc, char** argv) {
 
     // Create class hierarchy, check for well-formedness
     ClassTreeNode classHierarchy(*cls);
-    // cout << classHierarchy << endl;
+    cout << classHierarchy << endl;
     makeSureTableIsEmpty(*cls); // Everything should be in classHierarchy
 
     // Check constructor calls

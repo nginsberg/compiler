@@ -6,10 +6,10 @@
 
 using namespace std;
 
-string Statements::print() {
+string Statements::print(int tabs) {
     string ret = "";
     for_each(ss.begin(), ss.end(), [&] (Statement *s) {
-        ret += "\t" + s->print() + "\n";
+        ret += string(tabs, '\t') + s->print() + "\n";
     });
     return ret;
 }
