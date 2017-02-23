@@ -6,19 +6,18 @@
 #include <list>
 
 #include "gc.h"
-#include "gc_cpp.h"
 #include "Expressions.h"
 
-class Statement : public gc {
+class Statement {
 public:
     Statement(int l): line(l) {}
     int line;
     virtual std::string print() { return ""; }
 };
 
-class Statements : public gc {
+class Statements {
 public:
-    std::list<Statement> ss;
+    std::list<Statement *> ss;
     std::string print();
 };
 
@@ -53,4 +52,49 @@ public:
     Statements block;
 };
 
+class ElseStatement : public Statement {
+public:
+    ElseStatement(int l, Statements s): Statement(l), ss(s) {}
+    std::string print() override;
+    Statements ss;
+};
+
+class ElifStatement : public Statement {
+public:
+    ElifStatement(int l, RExpr it, Statements s): Statement(l), ifTrue(it),
+        ss(s) {}
+    std::string print() override;
+    RExpr ifTrue;
+    Statements ss;
+};
+
+class Elifs : public Statement {
+public:
+    Elifs(): Statement(0) {}
+    std::string print() override;
+    std::list<ElifStatement> elifs;
+};
+
+
+class IfStatement : public Statement {
+public:
+    IfStatement(int l, RExpr it, Statements ss, Elifs els, ElseStatement e):
+        Statement(l), ifTrue(it), stmts(ss), elifs(els), el(e) {}
+    std::string print() override;
+    RExpr ifTrue;
+    Statements stmts;
+    Elifs elifs;
+    ElseStatement el;
+};
+
 #endif
+
+
+
+
+
+
+
+
+
+

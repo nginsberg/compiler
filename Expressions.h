@@ -5,9 +5,8 @@
 #include <iostream>
 
 #include "gc.h"
-#include "gc_cpp.h"
 
-class RExpr : public gc {
+class RExpr {
 public:
     RExpr(std::string s): str(s) {}
     std::string str;
@@ -15,7 +14,7 @@ public:
 
 std::ostream &operator<<(std::ostream &os, const RExpr &expr);
 
-class LExpr : public gc {
+class LExpr {
 public:
     LExpr(std::string s): str(s) {}
     std::string str;
@@ -23,7 +22,7 @@ public:
 
 std::ostream &operator<<(std::ostream &os, const LExpr &expr);
 
-class ActualArgs : public gc {
+class ActualArgs {
 public:
     ActualArgs(std::string s): str(s) {}
     std::string str;

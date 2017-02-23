@@ -8,7 +8,6 @@
     #include "Statements.h"
     #include "quack.tab.h"
     #include "gc.h"
-    #include "gc_cpp.h"
 
     using namespace std;
 

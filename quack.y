@@ -13,7 +13,6 @@
     #include "Expressions.h"
     #include "Statements.h"
     #include "gc.h"
-    #include "gc_cpp.h"
 
     using namespace std;
 
@@ -58,7 +57,6 @@
     Statements *stmts;
 }
 
-%define parse.error verbose
 %left EQUALS
 %left AND OR NOT
 %left ATMOST ATLEAST '<' '>'
@@ -109,6 +107,9 @@
 %type <rexpr> optional_r_expr
 %type <stmts> statements
 %type <stmts> statement_block
+%type <stmt>  else
+%type <stmt>  elif
+%type <stmt>  elifs
 
 %%
 // Top level rule
@@ -118,7 +119,7 @@ program:
 
 // Classes
 classes:
-    %empty {
+    /* empty */ {
         $$ = new Classes();
     }
     | classes class {
@@ -149,7 +150,7 @@ class_body:
 
 // Methods
 methods:
-    %empty {
+    /* empty */ {
         $$ = new Methods();
     }
     | methods method {
@@ -164,7 +165,7 @@ method:
     }
     ;
 formal_args:
-    %empty {
+    /* empty */ {
         $$ = new FormalArgs();
     }
     | formal_arg {
@@ -182,7 +183,7 @@ formal_arg:
     }
     ;
 return:
-    %empty {
+    /* empty */ {
         $$ = "Nothing";
     }
     | ':' ident {
@@ -191,12 +192,12 @@ return:
 
 // Statements
 statements:
-    %empty {
+    /* empty */ {
         $$ = new Statements();
     }
     | statements statement {
         Statements *stmts = $1;
-        stmts->ss.push_back(*$2);
+        stmts->ss.push_back($2);
         $$ = stmts;
     }
     ;
@@ -210,23 +211,42 @@ statement_block:
 statement:
     IF r_expr statement_block
     elifs
-    else
+    else {
+        RExpr *ifTrue = dynamic_cast<RExpr *>$2;
+        Statements *stmts = dynamic_cast<Statements *>$3;
+        Elifs *elifs = dynamic_cast<Elifs *>$4;
+        ElseStatement *el = dynamic_cast<ElseStatement *>$5;
+        $$ = new IfStatement(yylineno, *ifTrue, *stmts, *elifs, *el);
+        cout << $$->print() << endl;
+    }
 elifs:
-    %empty
-    | elifs elif
+    /* empty */ {
+        $$ = new Elifs();
+    }
+    | elifs elif {
+        Elifs *es = dynamic_cast<Elifs *>$1;
+        ElifStatement *e = dynamic_cast<ElifStatement *>$2;
+        es->elifs.push_back(*e);
+        $$ = es;
+    }
     ;
 elif:
-    ELIF r_expr statement_block
+    ELIF r_expr statement_block {
+        $$ = new ElifStatement(yylineno, *$2, *$3);
+    }
     ;
 else:
-    %empty
-    | ELSE statement_block
+    /* empty */ {
+        $$ = new ElseStatement(0, Statements());
+    }
+    | ELSE statement_block {
+        $$ = new ElseStatement(yylineno, *$2);
+    }
     ;
 
 statement:
     WHILE r_expr statement_block {
         $$ = new WhileStatement(yylineno, *$2, *$3);
-        cout << $$->print() << endl;
     }
 
 // Return
@@ -236,7 +256,7 @@ statement:
     }
     ;
 optional_r_expr:
-    %empty {
+    /* empty */ {
         $$ = new RExpr("Nothing()");
     }
     | r_expr {
@@ -331,7 +351,7 @@ r_expr:
     }
     ;
 actual_args:
-    %empty {
+    /* empty */ {
         $$ = new ActualArgs("");
     }
     | actual_args ',' r_expr {

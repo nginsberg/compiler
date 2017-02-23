@@ -2,13 +2,12 @@
 #define METHODS_H_
 
 #include "gc.h"
-#include "gc_cpp.h"
 
 #include <string>
 #include <iostream>
 #include <list>
 
-class FormalArg : public gc {
+class FormalArg {
 public:
     FormalArg(std::string v, std::string t): var(v), type(t) {}
     std::string var;
@@ -17,7 +16,7 @@ public:
 
 std::ostream &operator<<(std::ostream &os, const FormalArg &formalArg);
 
-class FormalArgs : public gc {
+class FormalArgs {
 public:
     FormalArgs() {}
     FormalArgs(const FormalArg &fArg) { fArgs.push_back(fArg); }
@@ -28,7 +27,7 @@ public:
 
 std::ostream &operator<<(std::ostream &os, const FormalArgs &formalArgs);
 
-class Method : public gc {
+class Method {
 public:
     Method(std::string n, FormalArgs args, std::string r, int l):
         name(n), retType(r), fArgs(args), line(l) {}
@@ -40,7 +39,7 @@ public:
 
 std::ostream &operator<<(std::ostream &os, const Method &mthd);
 
-class Methods : public gc {
+class Methods {
 public:
     std::list<Method> methods;
 };
