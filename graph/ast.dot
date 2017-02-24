@@ -1,0 +1,67 @@
+digraph {
+	{
+		Obj [label="Obj(): 0"]
+		Nothing [label="Nothing(): 0"]
+		Int [label="Int(): 0"]
+		String [label="String(): 0"]
+		Boolean [label="Boolean(): 0"]
+		Pt [label="Pt(x: Int y: Int ): 5"]
+		Pt_STR[shape=box label="Pt.STR(-> String): 12"]
+		__STATEMENTS__0 [shape=record, label="{11: RET -> "(" + this.x.STR() + "," + this.y.STR() + ")"}"]
+		Pt_PLUS[shape=box label="Pt.PLUS(other: Pt -> Pt): 16"]
+		__STATEMENTS__1 [shape=record, label="{15: RET -> Pt(this.x + other.x, this.y + other.y)}"]
+		Pt_upWhile[shape=box label="Pt.upWhile(-> Nothing): 30"]
+		__STATEMENTS__2 [shape=record, label="{29: WHILE ((this.x < this.y)) ->
+	28: IF ((this.x < this.y)) ->
+	21: this.x GETS this.x + 1
+24: ELIF ((this.x + 1 == this.y)) ->
+	23: this.x GETS this.x + 4
+
+26: ELIF ((this.x == this.y)) ->
+	25: this.x GETS this.y
+
+28: ELSE ->
+	27: this.x GETS this.x - 1
+
+}"]
+		Pt__x[shape=box label="Pt._x(-> Int): 32"]
+		__STATEMENTS__3 [shape=record, label="{32: RET -> this.x}"]
+		Pt__y[shape=box label="Pt._y(-> Int): 33"]
+		__STATEMENTS__4 [shape=record, label="{33: RET -> this.y}"]
+		__STATEMENTS__5 [shape=record, label="{6: this.x GETS x|7: this.y GETS y}"]
+		Rect [label="Rect(ll: Pt ur: Pt ): 36"]
+		Rect_translate[shape=box label="Rect.translate(delta: Pt -> Pt): 40"]
+		__STATEMENTS__6 [shape=record, label="{40: RET -> Rect(ll + delta, ur + delta)}"]
+		Rect_STR[shape=box label="Rect.STR(-> String): 49"]
+		__STATEMENTS__7 [shape=record, label="{43: lr GETS Pt(this.ur._y(), this.ll._x())|44: ul GETS Pt(this.ll._x(), this.ur._y())|48: RET -> "(" + this.ll.STR() + ", " + ul.STR() + "," + this.ur.STR() + "," + lr.STR() + ")"}"]
+		__STATEMENTS__8 [shape=record, label="{37: this.ll GETS ll|38: this.ur GETS ur}"]
+		Square [label="Square(ll: Pt side: Int ): 52"]
+		__STATEMENTS__9 [shape=record, label="{53: this.ll GETS ll|54: this.ur GETS Pt(this.ll._x() + side, this.ll._y() + side)}"]
+
+	}
+	Obj -> Nothing
+	Obj -> Int
+	Obj -> String
+	Obj -> Boolean
+	Obj -> Pt
+	Obj -> Rect
+	Pt -> Pt_STR
+	Pt_STR -> __STATEMENTS__0
+	Pt -> Pt_PLUS
+	Pt_PLUS -> __STATEMENTS__1
+	Pt -> Pt_upWhile
+	Pt_upWhile -> __STATEMENTS__2
+	Pt -> Pt__x
+	Pt__x -> __STATEMENTS__3
+	Pt -> Pt__y
+	Pt__y -> __STATEMENTS__4
+	Pt -> __STATEMENTS__5
+	Rect -> Rect_translate
+	Rect_translate -> __STATEMENTS__6
+	Rect -> Rect_STR
+	Rect_STR -> __STATEMENTS__7
+	Rect -> __STATEMENTS__8
+	Rect -> Square
+	Square -> __STATEMENTS__9
+
+}
