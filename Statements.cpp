@@ -6,7 +6,7 @@
 
 using namespace std;
 
-string Statements::print(int tabs) {
+string Statements::print(int tabs) const {
     string ret = "";
     for_each(ss.begin(), ss.end(), [&] (Statement *s) {
         ret += string(tabs, '\t') + s->print() + "\n";

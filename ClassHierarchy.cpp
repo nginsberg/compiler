@@ -32,7 +32,10 @@ ostream &operator<<(ostream &os, const Classes &cls) {
 
 ostream &operator<<(ostream &os, const ClassBody &classBody) {
     os << "Methods:" << endl;
-    return os << classBody.mthds << endl;
+    os << classBody.mthds << endl;
+    os << "Statements:" << endl;
+    os << classBody.stmts.print(0) << endl;
+    return os;
 }
 
 /****************************** CLASS TREE ******************************/
@@ -42,13 +45,13 @@ ClassTreeNode::ClassTreeNode(Classes &cls) {
     this->line = 0;
 
     // Add default subclasses
-    ClassTreeNode *nothing = new ClassTreeNode("Nothing", FormalArgs(), 0, Methods());
+    ClassTreeNode *nothing = new ClassTreeNode("Nothing", FormalArgs(), 0, Methods(), Statements());
     this->subclasses.push_back(nothing);
-    ClassTreeNode *intClass = new ClassTreeNode("Int", FormalArgs(), 0, Methods());
+    ClassTreeNode *intClass = new ClassTreeNode("Int", FormalArgs(), 0, Methods(), Statements());
     this->subclasses.push_back(intClass);
-    ClassTreeNode *stringClass = new ClassTreeNode("String", FormalArgs(), 0, Methods());
+    ClassTreeNode *stringClass = new ClassTreeNode("String", FormalArgs(), 0, Methods(), Statements());
     this->subclasses.push_back(stringClass);
-    ClassTreeNode *boolClass = new ClassTreeNode("Boolean", FormalArgs(), 0, Methods());
+    ClassTreeNode *boolClass = new ClassTreeNode("Boolean", FormalArgs(), 0, Methods(), Statements());
     this->subclasses.push_back(boolClass);
 
     // First we check to make sure no class is defined multiple times
@@ -113,7 +116,7 @@ ClassTreeNode::ClassTreeNode(Classes &cls) {
                 // Create a new node
                 ClassTreeNode *currentClass =
                     new ClassTreeNode(iter->cs.className, iter->cs.fArgs,
-                        iter->cs.line, iter->cb.mthds);
+                        iter->cs.line, iter->cb.mthds, iter->cb.stmts);
                 // Add it as a subclass
                 current->subclasses.push_back(currentClass);
                 nodesToSearch.push(currentClass); // Add it to search

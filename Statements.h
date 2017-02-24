@@ -18,7 +18,7 @@ public:
 class Statements {
 public:
     std::list<Statement *> ss;
-    std::string print(int tabs = 1);
+    std::string print(int tabs = 1) const;
 };
 
 class BareStatement : public Statement {

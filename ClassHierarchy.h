@@ -9,6 +9,7 @@
 
 #include "gc.h"
 #include "Methods.h"
+#include "Statements.h"
 
 /****************************** CLASS TABLE ******************************/
 
@@ -26,8 +27,9 @@ std::ostream &operator<<(std::ostream &os, const ClassSignature &cs);
 
 class ClassBody {
 public:
-    ClassBody(const Methods &ms): mthds(ms) {}
+    ClassBody(const Methods &ms, const Statements &ss): mthds(ms), stmts(ss) {}
     Methods mthds;
+    Statements stmts;
 };
 
 std::ostream &operator<<(std::ostream &os, const ClassBody &classBody);
@@ -55,8 +57,8 @@ public:
     // Removes classes from table as it adds them - makes it easy to check
     // if the class hierarchy is valid.
     ClassTreeNode(Classes &cls);
-    ClassTreeNode(std::string name, FormalArgs args, int l, Methods m):
-        className(name), fArgs(args), line(l), methods(m) {}
+    ClassTreeNode(std::string name, FormalArgs args, int l, Methods m, Statements ss):
+        className(name), fArgs(args), line(l), methods(m), stmts(ss) {}
 
     bool makeSureClassExists(const std::string &name);
 
@@ -66,6 +68,7 @@ public:
     int line;
     Methods methods;
     FormalArgs fArgs;
+    Statements stmts;
 };
 
 std::ostream &operator<<(std::ostream &os, const ClassTreeNode &ctn);
