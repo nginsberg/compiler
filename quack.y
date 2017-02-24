@@ -161,7 +161,7 @@ methods:
     ;
 method:
     DEF ident '(' formal_args ')' return statement_block {
-        $$ = new Method($2, *$4, $6, yylineno);
+        $$ = new Method($2, *$4, $6, *$7, yylineno);
     }
     ;
 formal_args:

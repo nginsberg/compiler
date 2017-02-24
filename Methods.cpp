@@ -8,8 +8,9 @@
 using namespace std;
 
 ostream &operator<<(ostream &os, const Method &mthd) {
-    return os << "Name: " << mthd.name << " Args: " << mthd.fArgs
-        << " Return Type: " << mthd.retType << " Line: " << mthd.line;
+    os << "Name: " << mthd.name << " Args: " << mthd.fArgs << " Return Type: "
+        << mthd.retType << " Line: " << mthd.line << endl;
+    return os << mthd.stmts.print(0);
 }
 
 ostream &operator<<(ostream &os, const Methods &mthds) {

@@ -2,6 +2,7 @@
 #define METHODS_H_
 
 #include "gc.h"
+#include "Statements.h"
 
 #include <string>
 #include <iostream>
@@ -29,11 +30,12 @@ std::ostream &operator<<(std::ostream &os, const FormalArgs &formalArgs);
 
 class Method {
 public:
-    Method(std::string n, FormalArgs args, std::string r, int l):
-        name(n), retType(r), fArgs(args), line(l) {}
+    Method(std::string n, FormalArgs args, std::string r, Statements ss, int l):
+        name(n), retType(r), fArgs(args), stmts(ss), line(l) {}
     std::string name;
     std::string retType;
     FormalArgs fArgs;
+    Statements stmts;
     int line;
 };
 

@@ -145,7 +145,8 @@ ostream &operator<<(ostream &os, const ClassTreeNode &ctn) {
             current->className + "(" + current->fArgs.toString() + "): " + \
                 to_string(current->line) + "\"]\n";
 
-        // Add method nodes and an edge from class to methods
+        // Add method nodes, an edge from class to methods, method statements
+        // and an edge from each method to its statements
         for_each(current->methods.methods.begin(), current->methods.methods.end(),
             [&] (Method m) {
             nodes += "\t\t" + current->className + "_" + m.name + \
@@ -154,6 +155,11 @@ ostream &operator<<(ostream &os, const ClassTreeNode &ctn) {
                 to_string(m.line) + "\"]\n";
             edges += "\t" + current->className + " -> " \
                 + current->className + "_" + m.name + "\n";
+
+            string lblName = "__STATEMENTS__" + to_string(lbl++);
+            nodes += "\t\t" + m.stmts.node(lblName) + "\n";
+            edges += "\t" +current->className + "_" + m.name + " -> " + \
+                lblName + "\n";
         });
 
         // Add statements and edge to statements
