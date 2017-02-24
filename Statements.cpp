@@ -14,13 +14,23 @@ string Statements::print(int tabs) const {
     return ret;
 }
 
+string Statements::node(string lblName) const {
+    string ret = lblName + " [shape=record, label=\"{";
+    for(auto s = ss.begin(); s != ss.end(); ++s) {
+        ret += (*s)->print();
+        if (s != --ss.end()) { ret += "|"; }
+    }
+    ret += "}\"]";
+    return ret;
+}
+
 string BareStatement::print() {
     string ret = to_string(line) + ": " + expr.str;
     return ret;
 }
 
 string AssignStatement::print() {
-    string ret = to_string(line) + ": " + to.str + " <- " + from.str;
+    string ret = to_string(line) + ": " + to.str + " GETS " + from.str;
     return ret;
 }
 

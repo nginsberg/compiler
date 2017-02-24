@@ -19,6 +19,7 @@ class Statements {
 public:
     std::list<Statement *> ss;
     std::string print(int tabs = 1) const;
+    std::string node(std::string lblName) const;
 };
 
 class BareStatement : public Statement {

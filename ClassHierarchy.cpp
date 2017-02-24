@@ -131,6 +131,7 @@ ClassTreeNode::ClassTreeNode(Classes &cls) {
 ostream &operator<<(ostream &os, const ClassTreeNode &ctn) {
     os << "digraph {" << endl;
 
+    int lbl = 0;
     string nodes = "";
     string edges = "";
     queue<const ClassTreeNode *>toPrint;
@@ -154,6 +155,13 @@ ostream &operator<<(ostream &os, const ClassTreeNode &ctn) {
             edges += "\t" + current->className + " -> " \
                 + current->className + "_" + m.name + "\n";
         });
+
+        // Add statements and edge to statements
+        if(current->stmts.ss.size() > 0) {
+            string lblName = "__STATEMENTS__" + to_string(lbl++);
+            nodes += "\t\t" + current->stmts.node(lblName) + "\n";
+            edges += "\t" + current->className + " -> " + lblName + "\n";
+        }
 
         for_each(current->subclasses.begin(), current->subclasses.end(),
             [&] (ClassTreeNode *subclass) {

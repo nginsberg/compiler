@@ -389,7 +389,7 @@ int main(int argc, char** argv) {
 
     // Create class hierarchy, check for well-formedness
     ClassTreeNode classHierarchy(*cls);
-    // cout << classHierarchy << endl;
+    cout << classHierarchy << endl;
     makeSureTableIsEmpty(*cls); // Everything should be in classHierarchy
 
     // Check constructor calls
