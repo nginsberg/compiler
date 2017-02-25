@@ -289,10 +289,10 @@ l_expr:
 
 r_expr:
     string_lit {
-        $$ = new RExpr($1);
+        $$ = new StringLit(yylineno, $1);
     }
     | int_lit {
-        $$ = new RExpr(to_string($1));
+        $$ = new IntLit(yylineno, $1);
     }
     | l_expr {
         $$ = new RExpr($1->str);
@@ -389,7 +389,7 @@ int main(int argc, char** argv) {
 
     // Create class hierarchy, check for well-formedness
     ClassTreeNode classHierarchy(*cls);
-    cout << classHierarchy << endl;
+    // cout << classHierarchy << endl;
     makeSureTableIsEmpty(*cls); // Everything should be in classHierarchy
 
     // Check constructor calls

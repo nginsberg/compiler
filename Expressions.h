@@ -3,16 +3,31 @@
 
 #include <string>
 #include <iostream>
+#include <algorithm>
 
 #include "gc.h"
 
 class RExpr {
 public:
-    RExpr(std::string s): str(s) {}
+    RExpr(std::string s = "", int l = 0): line(l), str(s) {}
     std::string str;
+    int line;
+    virtual std::string print() { return ""; }
 };
 
-std::ostream &operator<<(std::ostream &os, const RExpr &expr);
+class StringLit : public RExpr {
+public:
+    StringLit(int l, std::string v): RExpr("", l), val(v) {}
+    std::string print() override { return val; }
+    std::string val;
+};
+
+class IntLit : public RExpr {
+public:
+    IntLit(int l, int v): RExpr("", l), val(v) {}
+    std::string print() override { return std::to_string(val); }
+    int val;
+};
 
 class LExpr {
 public:
