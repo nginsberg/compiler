@@ -280,10 +280,10 @@ statement:
 // Expressions
 l_expr:
     ident {
-        $$ = new LExpr($1);
+        $$ = new LExpr(yylineno, $1);
     }
     | r_expr '.' ident {
-        $$ = new LExpr($1->str + "." + $3);
+        $$ = new LExpr(yylineno, $1, $3);
     }
     ;
 
@@ -295,7 +295,7 @@ r_expr:
         $$ = new IntLit(yylineno, $1);
     }
     | l_expr {
-        $$ = new RExpr($1->str);
+        $$ = $1;
     }
     | r_expr '+' r_expr {
         $$ = new RExpr($1->str + " + " + $3->str);
@@ -340,24 +340,27 @@ r_expr:
         $$ = new RExpr("NOT " + $2->str);
     }
     | r_expr '.' ident '(' actual_args ')' {
-        $$ = new RExpr($1->str + "." + $3 + "(" + $5->str + ")");
+        $$ = new RExpr($1->str + "." + $3 + "(" + $5->print() + ")");
     }
     | ident '(' actual_args ')' {
         constructorCalls.push_back(pair<string,int>($1, yylineno));
 
-        string s = $1;
-        $$ = new RExpr(s + "(" + $3->str + ")");
+        $$ = new ConstructorCall(yylineno, $1, *$3);
+        cout << $$->print() << endl;
     }
     ;
 actual_args:
     /* empty */ {
-        $$ = new ActualArgs("");
+        $$ = new ActualArgs();
     }
     | actual_args ',' r_expr {
-        $$ = new ActualArgs($1->str + ", " + $3->str);
+        ActualArgs *args = $1;
+        args->args.push_back($3);
+        $$ = args;
     }
     | r_expr {
-        $$ = new ActualArgs($1->str);
+        $$ = new ActualArgs();
+        $$->args.push_back($1);
     }
     ;
 

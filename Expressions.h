@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <list>
 
 #include "gc.h"
 
@@ -29,20 +30,30 @@ public:
     int val;
 };
 
-class LExpr {
+class LExpr : public RExpr {
 public:
-    LExpr(std::string s): str(s) {}
-    std::string str;
-};
+    LExpr(int l, RExpr *e, std::string i): RExpr("", l), expr(e), ident(i) {}
+    LExpr(int l, std::string i): RExpr("", l), expr(NULL), ident(i) {}
+    std::string print() override;
 
-std::ostream &operator<<(std::ostream &os, const LExpr &expr);
+    RExpr *expr;
+    std::string ident;
+};
 
 class ActualArgs {
 public:
-    ActualArgs(std::string s): str(s) {}
-    std::string str;
+    std::list<RExpr *>args;
+    std::string print();
 };
 
-std::ostream &operator<<(std::ostream &os, const ActualArgs &args);
+class ConstructorCall : public RExpr {
+public:
+    ConstructorCall(int l, std::string name, ActualArgs a): RExpr("", l), \
+        className(name), args(a) {}
+    std::string print() override;
+
+    std::string className;
+    ActualArgs args;
+};
 
 #endif
