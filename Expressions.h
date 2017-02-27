@@ -56,4 +56,57 @@ public:
     ActualArgs args;
 };
 
+class FunctionCall : public RExpr {
+public:
+    FunctionCall(int l, RExpr *e, std::string name, ActualArgs a): \
+        RExpr("", l), expr(e), functionName(name), args(a) {}
+    std::string print() override;
+
+    RExpr *expr;
+    std::string functionName;
+    ActualArgs args;
+};
+
+class AndExpr : public RExpr {
+public:
+    AndExpr(int l, RExpr *f, RExpr *s): RExpr("", l), first(f), second(s) {}
+    std::string print() override;
+
+    RExpr *first;
+    RExpr *second;
+};
+
+class OrExpr : public RExpr {
+public:
+    OrExpr(int l, RExpr *f, RExpr *s): RExpr("", l), first(f), second(s) {}
+    std::string print() override;
+
+    RExpr *first;
+    RExpr *second;
+};
+
+class NotExpr : public RExpr {
+public:
+    NotExpr(int l, RExpr *e): RExpr("", l), expr(e) {}
+    std::string print() override;
+
+    RExpr *expr;
+};
+
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

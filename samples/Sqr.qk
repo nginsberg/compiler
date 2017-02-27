@@ -16,7 +16,7 @@ class Pt(x: Int, y: Int) {
   }
 
   def upWhile() {
-      while (this.x < this.y) {
+      while (not this.x) {
           if (this.x < this.y) {
               this.x = this.x + 1;
           } elif (this.x + 1 == this.y) {

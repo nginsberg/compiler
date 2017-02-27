@@ -19,10 +19,26 @@ string ConstructorCall::print() {
     return className + "(" + args.print() + ")";
 }
 
+string FunctionCall::print() {
+    return expr->print() + "." + functionName + "(" + args.print() + ")";
+}
+
 string ActualArgs::print() {
     string ret = "";
     for_each(args.begin(), args.end(), [&] (RExpr *expr) {
         ret += expr->print() + ", ";
     });
     return ret;
+}
+
+string AndExpr::print() {
+    return first->print() + " && " + second->print();
+}
+
+string OrExpr::print() {
+    return first->print() + " || " + second->print();
+}
+
+string NotExpr::print() {
+    return "NOT " + expr->print();
 }

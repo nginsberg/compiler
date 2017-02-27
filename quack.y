@@ -298,55 +298,75 @@ r_expr:
         $$ = $1;
     }
     | r_expr '+' r_expr {
-        $$ = new RExpr($1->str + " + " + $3->str);
+        ActualArgs as;
+        as.args.push_back($3);
+        $$ = new FunctionCall(yylineno, $1, "PLUS", as);
     }
     | r_expr '-' r_expr {
-        $$ = new RExpr($1->str + " - " + $3->str);
+        ActualArgs as;
+        as.args.push_back($3);
+        $$ = new FunctionCall(yylineno, $1, "MINUS", as);
     }
     | '-' r_expr %prec UNARY {
-        $$ = new RExpr("- " + $2->str);
+        IntLit *zero = new IntLit(yylineno, 0);
+        ActualArgs as;
+        as.args.push_back($2);
+        $$ = new FunctionCall(yylineno, zero, "MINUS", as);
     }
     | r_expr '/' r_expr {
-        $$ = new RExpr($1->str + " / " + $3->str);
+        ActualArgs as;
+        as.args.push_back($3);
+        $$ = new FunctionCall(yylineno, $1, "DIVIDE", as);
     }
     | r_expr '*' r_expr {
-        $$ = new RExpr($1->str + " * " + $3->str);
+        ActualArgs as;
+        as.args.push_back($3);
+        $$ = new FunctionCall(yylineno, $1, "TIMES", as);
     }
     | '(' r_expr ')' {
-        $$ = new RExpr("(" + $2->str + ")");
+        $$ = $2;
     }
     | r_expr EQUALS r_expr {
-        $$ = new RExpr($1->str + " == " + $3->str);
+        ActualArgs as;
+        as.args.push_back($3);
+        $$ = new FunctionCall(yylineno, $1, "EQUALS", as);
     }
     | r_expr ATMOST r_expr {
-        $$ = new RExpr($1->str + " <= " + $3->str);
+        ActualArgs as;
+        as.args.push_back($3);
+        $$ = new FunctionCall(yylineno, $1, "ATMOST", as);
     }
     | r_expr '<' r_expr {
-        $$ = new RExpr($1->str + " < " + $3->str);
+        ActualArgs as;
+        as.args.push_back($3);
+        $$ = new FunctionCall(yylineno, $1, "LESS", as);
     }
     | r_expr ATLEAST r_expr {
-        $$ = new RExpr($1->str + " >= " + $3->str);
+        ActualArgs as;
+        as.args.push_back($3);
+        $$ = new FunctionCall(yylineno, $1, "ATLEAST", as);
     }
     | r_expr '>' r_expr {
-        $$ = new RExpr($1->str + " > " + $3->str);
+        ActualArgs as;
+        as.args.push_back($3);
+        $$ = new FunctionCall(yylineno, $1, "MORE", as);
     }
     | r_expr AND r_expr {
-        $$ = new RExpr($1->str + " AND " + $3->str);
+        $$ = new AndExpr(yylineno, $1, $3);
     }
     | r_expr OR r_expr {
-        $$ = new RExpr($1->str + " OR " + $3->str);
+        $$ = new OrExpr(yylineno, $1, $3);
     }
     | NOT r_expr {
-        $$ = new RExpr("NOT " + $2->str);
+        $$ = new NotExpr(yylineno, $2);
     }
     | r_expr '.' ident '(' actual_args ')' {
-        $$ = new RExpr($1->str + "." + $3 + "(" + $5->print() + ")");
+        $$ = new FunctionCall(yylineno, $1, $3, *$5);
     }
     | ident '(' actual_args ')' {
         constructorCalls.push_back(pair<string,int>($1, yylineno));
 
         $$ = new ConstructorCall(yylineno, $1, *$3);
-        cout << $$->print() << endl;
     }
     ;
 actual_args:
