@@ -12,6 +12,7 @@
     #include "Methods.h"
     #include "Expressions.h"
     #include "Statements.h"
+    #include "Static.h"
     #include "gc.h"
 
     using namespace std;
@@ -25,6 +26,7 @@
     extern char *yytext;
 
     Classes *cls;
+    Statements *stmts; // Main body statements
 
     // Clearly this is not how this will be done in the future - this will
     // need to be a tree representing the rest of the grammar, very similar
@@ -114,7 +116,10 @@
 %%
 // Top level rule
 program:
-    classes statements
+    classes statements {
+        cls = $1;
+        stmts = $2;
+    }
     ;
 
 // Classes
@@ -126,7 +131,6 @@ classes:
         Classes *cls = $1;
         cls->classes.push_back(*$2);
         $$ = cls;
-        ::cls = cls;
     }
     ;
 class:
@@ -266,7 +270,7 @@ optional_r_expr:
 // Assignment
 statement:
     l_expr '=' r_expr ';' {
-        $$ = new AssignStatement(yylineno, *$1, *$3);
+        $$ = new AssignStatement(yylineno, $1, $3);
     }
     ;
 
@@ -415,22 +419,15 @@ int main(int argc, char** argv) {
     // cout << classHierarchy << endl;
     makeSureTableIsEmpty(*cls); // Everything should be in classHierarchy
 
-    // Check constructor calls
-    bool hadBadConstructor = false;
-    for_each(constructorCalls.begin(), constructorCalls.end(),
-        [&] (pair<string,int> call) {
-            bool isValid = classHierarchy.makeSureClassExists(call.first);
-            if (!isValid) {
-                cerr << "Error: " << call.second << ": Call to constructor for"
-                << " class " << call.first << " when " << call.first
-                << " was never defined." << endl;
-                hadBadConstructor = true;
-            }
+    Scope mainScope;
+    for_each(stmts->ss.begin(), stmts->ss.end(), [&] (Statement *stmnt) {
+        if (AssignStatement *assignment = dynamic_cast<AssignStatement *>(stmnt)) {
+            string t = type(assignment->from, &classHierarchy, mainScope);
+            mainScope.tokens[assignment->to->print()] = t;
+            cout << assignment->to->print() << ": " << t << endl;
+        }
         });
-    if (hadBadConstructor) { exit(-1); }
 
-    cout << "Finished 'compile' with no errors! (Class hierarchy + constructor"
-        << " calls)" << endl;
     return 0;
 }
 

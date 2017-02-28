@@ -188,20 +188,20 @@ ostream &operator<<(ostream &os, const ClassTreeNode &ctn) {
 }
 
 // BFS until we find the right class or search the whole tree
-bool ClassTreeNode::makeSureClassExists(const string &name) {
+ClassTreeNode *ClassTreeNode::classFromName(const string &name) {
     queue<ClassTreeNode *> toSearch;
     toSearch.push(this);
 
     while(!toSearch.empty()) {
         ClassTreeNode *current = toSearch.front();
         toSearch.pop();
-        if (current->className == name) { return true; }
+        if (current->className == name) { return current; }
         for_each(current->subclasses.begin(), current->subclasses.end(),
             [&] (ClassTreeNode * ctn) {
                 toSearch.push(ctn);
             });
     }
-    return false;
+    return NULL;
 }
 
 void makeSureTableIsEmpty(const Classes &cls) {

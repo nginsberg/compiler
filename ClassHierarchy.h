@@ -60,7 +60,7 @@ public:
     ClassTreeNode(std::string name, FormalArgs args, int l, Methods m, Statements ss):
         className(name), fArgs(args), line(l), methods(m), stmts(ss) {}
 
-    bool makeSureClassExists(const std::string &name);
+    ClassTreeNode *classFromName(const std::string &name);
 
     std::list<ClassTreeNode *> subclasses;
 

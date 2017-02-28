@@ -55,5 +55,9 @@ class Square(ll: Pt, side: Int) extends Rect {
 }
 
 a_square = Square( Pt(3,3), 5 );
+b_square = a_square;
 a_square = a_square.translate( Pt(2,2) );
 a_square.PRINT();
+boo = "boo";
+num = 3;
+test = FakeClass();

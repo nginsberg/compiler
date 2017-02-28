@@ -31,10 +31,10 @@ public:
 
 class AssignStatement : public Statement {
 public:
-    AssignStatement(int l, LExpr t, RExpr f): Statement(l), to(t), from(f) {}
+    AssignStatement(int l, LExpr *t, RExpr *f): Statement(l), to(t), from(f) {}
     std::string print() override;
-    LExpr to;
-    RExpr from;
+    LExpr *to;
+    RExpr *from;
 };
 
 class ReturnStatement : public Statement {
