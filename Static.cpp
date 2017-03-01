@@ -7,7 +7,8 @@
 
 using namespace std;
 
-string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope) {
+string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,
+        const Scope &classScope) {
     string unknown = "$Unknown";
 
     if(StringLit *strLit = dynamic_cast<StringLit *>(expr)) {
@@ -21,22 +22,39 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope) {
             << "definded." << endl;
         return unknown;
     } else if (LExpr *lexpr = dynamic_cast<LExpr *>(expr)) {
-        if(lexpr->expr) {
-            // As far as I can tell, the only reason this should happen is for
-            // access within a class, as with this.varname. Anything else would
-            // be attempting to access a private field, since everything
-            // defaults to private.
-            if (lexpr->expr->print() != "this") {
-                cerr << "Error: " << lexpr->expr->line << ": Attempt to access"
-                    << " private member " << lexpr->ident << " of class "
-                    << type(lexpr->expr, AST, scope) << endl;
+        if (lexpr->expr) {
+            // The type of expr needs to be the same as the type of this, or
+            // else we shouldn't be accessing the protected value. So we check
+            // that, and then look up the ident in the class scope.
+
+            // Make sure we are in a class (not global scope)
+            if (classScope.tokens.find("this") == classScope.tokens.end()) {
+                cerr << "Error: " << lexpr->line << ": Attempt to access "
+                    << " member value from global scope." << endl;
                 return unknown;
             }
+
+            // Make sure we are attempting to access data from the same class
+            string thisType = classScope.tokens.find("this")->second;
+            string otherType = type(lexpr->expr, AST, scope, classScope);
+            if (thisType != otherType) {
+                cerr << "Error : " << lexpr->line << ": Attemt to access "
+                    << " member value from variable of type " << otherType
+                    << " in class " << thisType << endl;
+                return unknown;
+            }
+
+            // Make sure our class has a member of the provided name
+            if (classScope.tokens.find(lexpr->ident) == classScope.tokens.end()) {
+                cerr << "Error : " << lexpr->line << ": Class " << thisType
+                    << " does not have a member value named " << lexpr->ident
+                    << endl;
+                return unknown;
+            }
+
+            // Return the type of the ident from our class scope.
+            return classScope.tokens.find(lexpr->ident)->second;
         }
-        if(scope.tokens.find(lexpr->print()) != scope.tokens.end()) {
-            return scope.tokens.find(lexpr->print())->second;
-        }
-        return unknown;
     } else if (FunctionCall *call = dynamic_cast<FunctionCall *>(expr)) {
         // TODO: this doesn't check up the inheritance tree yet.
 

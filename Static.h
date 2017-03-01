@@ -12,6 +12,7 @@ public:
     std::map<std::string, std::string> tokens;
 };
 
-std::string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope);
+std::string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,
+    const Scope &classScope = Scope());
 
 #endif
