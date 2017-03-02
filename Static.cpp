@@ -38,7 +38,7 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,
             string thisType = classScope.tokens.find("this")->second;
             string otherType = type(lexpr->expr, AST, scope, classScope);
             if (thisType != otherType) {
-                cerr << "Error : " << lexpr->line << ": Attemt to access "
+                cerr << "Error: " << lexpr->line << ": Attempt to access "
                     << " member value from variable of type " << otherType
                     << " in class " << thisType << endl;
                 return unknown;
@@ -46,7 +46,7 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,
 
             // Make sure our class has a member of the provided name
             if (classScope.tokens.find(lexpr->ident) == classScope.tokens.end()) {
-                cerr << "Error : " << lexpr->line << ": Class " << thisType
+                cerr << "Error: " << lexpr->line << ": Class " << thisType
                     << " does not have a member value named " << lexpr->ident
                     << endl;
                 return unknown;
@@ -54,10 +54,17 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,
 
             // Return the type of the ident from our class scope.
             return classScope.tokens.find(lexpr->ident)->second;
+        } else {
+            // Make sure the local scope has a variable of the provided name
+            if (scope.tokens.find(lexpr->ident) == scope.tokens.end()) {
+                cerr << "Error: " << lexpr->line << ": Attempt to access "
+                    << " uninitialized variable " << lexpr->ident << endl;
+                return unknown;
+            }
+
+            return scope.tokens.find(lexpr->ident)->second;
         }
     } else if (FunctionCall *call = dynamic_cast<FunctionCall *>(expr)) {
-        // TODO: this doesn't check up the inheritance tree yet.
-
         // Get the name of the class
         string className = type(call->expr, AST, scope);
         if (className == unknown) {
@@ -76,13 +83,18 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,
         }
 
         // Find out if the class responsds to the method
-        string ret = unknown;
-        for_each(cl->methods.methods.begin(), cl->methods.methods.end(),
-            [&] (Method m) {
-                if (call->functionName == m.name) {
-                    ret = m.retType;
-                }
-            });
+        string name = call->functionName;
+        list<string> argTypes;
+        for (auto arg = call->args.args.begin(); arg != call->args.args.end();
+            ++arg) {
+            argTypes.push_back(type(*arg, AST, scope, classScope));
+        }
+        string ret = cl->returnTypeForFunction(name, argTypes);
+        if (ret == "") {
+            cerr << "Error: " << call->line << ": Unable to find function "
+                << "matching " << call->print() << endl;
+            return unknown;
+        }
         return ret;
     }
     return unknown;

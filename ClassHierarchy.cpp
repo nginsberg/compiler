@@ -209,6 +209,48 @@ ClassTreeNode *ClassTreeNode::classFromName(const string &name) {
     return NULL;
 }
 
+list<ClassTreeNode *>ClassTreeNode::superChain() {
+    ClassTreeNode *current = this;
+    list<ClassTreeNode *> ret;
+    while (current->superclass) {
+        ret.push_back(current->superclass);
+        current = current->superclass;
+    }
+
+    return ret;
+}
+
+string ClassTreeNode::returnTypeForFunction(string name, list<string> argTypes) {
+    list<ClassTreeNode *>toSearch = superChain();
+    toSearch.push_front(this);
+
+    for(auto cl = toSearch.begin(); cl != toSearch.end(); ++cl) {
+        Methods ms = (*cl)->methods;
+        for (auto method = ms.methods.begin(); method != ms.methods.end(); ++method) {
+            // Check name is the same
+            if (method->name != name) { continue; }
+            // Check there are the right number of args
+            if (method->fArgs.fArgs.size() != argTypes.size()) { continue; }
+            // Make sure all types match
+            auto req = method->fArgs.fArgs.begin(); // Required formal arg
+            auto sup = argTypes.begin(); // Supplied type
+            bool matchedUp = true;
+            while (sup != argTypes.end()) {
+                if (req->type != *sup) {
+                    matchedUp = false;
+                    break;
+                }
+                ++req;
+                ++sup;
+            }
+            if (!matchedUp) { continue; }
+            return method->retType;
+        }
+    }
+
+    return "";
+}
+
 void makeSureTableIsEmpty(const Classes &cls) {
     if (!cls.classes.empty()) {
         for_each(cls.classes.begin(), cls.classes.end(),

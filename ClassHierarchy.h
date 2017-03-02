@@ -62,6 +62,12 @@ public:
         superclass(NULL) {}
 
     ClassTreeNode *classFromName(const std::string &name);
+    // A list of all classes this inherits from
+    std::list<ClassTreeNode *>superChain();
+    // Returns the return type for the corresponding function, or the empty
+    // string if none is found.
+    std::string returnTypeForFunction(std::string name,
+        std::list<std::string> argTypes);
 
     std::list<ClassTreeNode *> subclasses;
     ClassTreeNode *superclass;
