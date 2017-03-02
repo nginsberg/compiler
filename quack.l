@@ -7,7 +7,6 @@
     #include "Expressions.h"
     #include "Statements.h"
     #include "quack.tab.h"
-    #include "Static.h"
     #include "gc.h"
 
     using namespace std;

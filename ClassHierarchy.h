@@ -77,7 +77,11 @@ public:
     Methods methods;
     FormalArgs fArgs;
     Statements stmts;
+    Scope scope, constructorScope;
 };
+
+std::string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,
+    const Scope &classScope = Scope());
 
 std::string leastCommonAncestor(ClassTreeNode *c1, ClassTreeNode *c2);
 

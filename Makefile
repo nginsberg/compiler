@@ -1,5 +1,5 @@
 SOURCES = ClassHierarchy.cpp Methods.cpp Expressions.cpp Statements.cpp Static.cpp
-HEADERS = ClassHierarchy.h Methods.h Expressions.h Statements.h Static.h
+HEADERS = ClassHierarchy.h Methods.h Expressions.h Statements.h
 OBJECTS = $(SOURCES:.cpp=.o)
 DOTS = graph/ast.dot
 GRAPHS = $(DOTS:.dot=.png)

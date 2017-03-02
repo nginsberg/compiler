@@ -30,7 +30,7 @@ string BareStatement::print() {
 }
 
 string AssignStatement::print() {
-    string ret = to_string(line) + ": " + to.str + " GETS " + from.str;
+    string ret = to_string(line) + ": " + to->str + " GETS " + from->str;
     return ret;
 }
 

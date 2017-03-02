@@ -7,6 +7,7 @@
 #include <string>
 #include <iostream>
 #include <list>
+#include <map>
 
 class FormalArg {
 public:
@@ -28,15 +29,23 @@ public:
 
 std::ostream &operator<<(std::ostream &os, const FormalArgs &formalArgs);
 
+class Scope {
+public:
+    std::map<std::string, std::string> tokens;
+};
+
 class Method {
 public:
     Method(std::string n, FormalArgs args, std::string r, Statements ss, int l):
-        name(n), retType(r), fArgs(args), stmts(ss), line(l) {}
+        name(n), retType(r), fArgs(args), stmts(ss), line(l), classScope(NULL) {}
     std::string name;
     std::string retType;
     FormalArgs fArgs;
     Statements stmts;
     int line;
+
+    Scope scope;
+    Scope *classScope;
 };
 
 std::ostream &operator<<(std::ostream &os, const Method &mthd);

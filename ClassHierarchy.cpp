@@ -122,6 +122,11 @@ ClassTreeNode::ClassTreeNode(Classes &cls) {
                     new ClassTreeNode(iter->cs.className, iter->cs.fArgs,
                         iter->cs.line, iter->cb.mthds, iter->cb.stmts);
                 currentClass->superclass = current;
+                // Set the class scope of all the methods to point to this class
+                for (auto m = currentClass->methods.methods.begin();
+                    m != currentClass->methods.methods.end(); ++m) {
+                    m->classScope = &(currentClass->scope);
+                }
                 // Add it as a subclass
                 current->subclasses.push_back(currentClass);
                 nodesToSearch.push(currentClass); // Add it to search

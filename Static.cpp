@@ -3,7 +3,6 @@
 
 #include "Expressions.h"
 #include "ClassHierarchy.h"
-#include "Static.h"
 
 using namespace std;
 
