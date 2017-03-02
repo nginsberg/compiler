@@ -58,11 +58,13 @@ public:
     // if the class hierarchy is valid.
     ClassTreeNode(Classes &cls);
     ClassTreeNode(std::string name, FormalArgs args, int l, Methods m, Statements ss):
-        className(name), fArgs(args), line(l), methods(m), stmts(ss) {}
+        className(name), fArgs(args), line(l), methods(m), stmts(ss),
+        superclass(NULL) {}
 
     ClassTreeNode *classFromName(const std::string &name);
 
     std::list<ClassTreeNode *> subclasses;
+    ClassTreeNode *superclass;
 
     std::string className;
     int line;
