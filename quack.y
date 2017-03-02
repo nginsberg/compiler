@@ -423,8 +423,18 @@ int main(int argc, char** argv) {
     for_each(stmts->ss.begin(), stmts->ss.end(), [&] (Statement *stmnt) {
         if (AssignStatement *assignment = dynamic_cast<AssignStatement *>(stmnt)) {
             string t = type(assignment->from, &classHierarchy, mainScope);
-            mainScope.tokens[assignment->to->print()] = t;
-            cout << assignment->to->print() << ": " << t << endl;
+
+            // Figure out new type
+            // First, test if we've seen it before. If we haven't we just add it
+            auto var = mainScope.tokens.find(assignment->to->print());
+            if (var == mainScope.tokens.end()) { // We found a new variable
+                mainScope.tokens[assignment->to->print()] = t;
+            } else { // We are reassigning
+                ClassTreeNode *c1 = classHierarchy.classFromName(var->second);
+                ClassTreeNode *c2 = classHierarchy.classFromName(t);
+                mainScope.tokens[assignment->to->print()] = leastCommonAncestor(c1, c2);
+            }
+            cout << assignment->to->print() << ": " << mainScope.tokens[assignment->to->print()] << endl;
         }
         });
 

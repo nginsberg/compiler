@@ -251,6 +251,27 @@ string ClassTreeNode::returnTypeForFunction(string name, list<string> argTypes) 
     return "";
 }
 
+string leastCommonAncestor(ClassTreeNode *c1, ClassTreeNode *c2) {
+    // First we get the superchain of each class
+    list<ClassTreeNode *>s1 = c1->superChain();
+    s1.push_front(c1);
+    list<ClassTreeNode *>s2 = c2->superChain();
+    s2.push_front(c2);
+
+    for (auto super1 = s1.begin(); super1 != s1.end(); ++super1) {
+        for (auto super2 = s2.begin(); super2 != s2.end(); ++super2) {
+            if ((*super1)->className == (*super2)->className) {
+                // We will always return here since we will eventually compare
+                // and return Obj and Obj, since all superChains end at Obj.
+                // G++ doesn't know this, though, so we need another return
+                return (*super1)->className;
+            }
+        }
+    }
+
+    return "Obj";
+}
+
 void makeSureTableIsEmpty(const Classes &cls) {
     if (!cls.classes.empty()) {
         for_each(cls.classes.begin(), cls.classes.end(),

@@ -79,6 +79,8 @@ public:
     Statements stmts;
 };
 
+std::string leastCommonAncestor(ClassTreeNode *c1, ClassTreeNode *c2);
+
 std::ostream &operator<<(std::ostream &os, const ClassTreeNode &ctn);
 
 void makeSureTableIsEmpty(const Classes &cls);

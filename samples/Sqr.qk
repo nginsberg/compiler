@@ -59,4 +59,5 @@ a_square = a_square.translate( Pt(2,2) );
 a_square.PRINT();
 boo = "boo";
 num = 3;
+num = "boo";
 test = FakeClass();
