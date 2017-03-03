@@ -101,7 +101,47 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,
 }
 
 void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
-    Scope &classScope, bool inConstructor) {}
+    Scope &classScope, bool inConstructor) {
+    for_each(stmts.ss.begin(), stmts.ss.end(), [&] (Statement *stmnt) {
+        if (AssignStatement *assignment = dynamic_cast<AssignStatement *>(stmnt)) {
+            // First we determine if this is an assignment to the local scope
+            // or the class scope
+            Scope *usedScope;
+            bool canCreateNewVariable = true;
+            if (assignment->to->expr) {
+                if (assignment->to->expr->print() != "this") {
+                    cerr << "Error: " << assignment->line << ": Attempt to "
+                        << "assign to a member variable from a different class"
+                        << "." << endl;
+                    return;
+                }
+                usedScope = &classScope;
+                canCreateNewVariable = inConstructor;
+            } else {
+                usedScope = &scope;
+            }
+
+            // Determine the new type
+            string t = type(assignment->from, AST, scope, classScope);
+
+            // Add it to the proper scope.
+            auto var = usedScope->tokens.find(assignment->to->ident);
+            if (var == usedScope->tokens.end()) { // New variable
+                if (!canCreateNewVariable) {
+                    cerr << "Error: " << assignment->line << ": class member "
+                        << "variable " << assignment->to->ident << " must be "
+                        << "initialized in the constructor." << endl;
+                    return;
+                }
+                usedScope->tokens[assignment->to->ident] = t;
+            } else {
+                ClassTreeNode *c1 = AST->classFromName(var->second);
+                ClassTreeNode *c2 = AST->classFromName(t);
+                usedScope->tokens[assignment->to->ident] = leastCommonAncestor(c1, c2);
+            }
+        }
+    });
+}
 
 void computeAllScopes(ClassTreeNode *AST) {
     queue<ClassTreeNode *> toProcess;

@@ -418,6 +418,8 @@ int main(int argc, char** argv) {
     // cout << classHierarchy << endl;
     makeSureTableIsEmpty(*cls); // Everything should be in classHierarchy
 
+    computeAllScopes(&classHierarchy);
+
     Scope mainScope;
     for_each(stmts->ss.begin(), stmts->ss.end(), [&] (Statement *stmnt) {
         if (AssignStatement *assignment = dynamic_cast<AssignStatement *>(stmnt)) {
@@ -433,12 +435,10 @@ int main(int argc, char** argv) {
                 ClassTreeNode *c2 = classHierarchy.classFromName(t);
                 mainScope.tokens[assignment->to->print()] = leastCommonAncestor(c1, c2);
             }
-            cout << assignment->to->print() << ": " << mainScope.tokens[assignment->to->print()] << endl;
+            // cout << assignment->to->print() << ": " << mainScope.tokens[assignment->to->print()] << endl;
         }
         });
 
-
-    computeAllScopes(&classHierarchy);
     return 0;
 }
 

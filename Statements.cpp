@@ -25,22 +25,22 @@ string Statements::node(string lblName) const {
 }
 
 string BareStatement::print() {
-    string ret = to_string(line) + ": " + expr.str;
+    string ret = to_string(line) + ": " + expr.print();
     return ret;
 }
 
 string AssignStatement::print() {
-    string ret = to_string(line) + ": " + to->str + " GETS " + from->str;
+    string ret = to_string(line) + ": " + to->print() + " GETS " + from->print();
     return ret;
 }
 
 string ReturnStatement::print() {
-    string ret = to_string(line) + ": RET -> " + this->ret.str;
+    string ret = to_string(line) + ": RET -> " + this->ret.print();
     return ret;
 }
 
 string WhileStatement::print() {
-    string ret = to_string(line) + ": WHILE (" + ifTrue.str + ") ->\n";
+    string ret = to_string(line) + ": WHILE (" + ifTrue.print() + ") ->\n";
     ret += block.print();
     return ret;
 }
@@ -52,7 +52,7 @@ string ElseStatement::print() {
 }
 
 string ElifStatement::print() {
-    string ret = to_string(line) + ": ELIF (" + ifTrue.str + ") ->\n";
+    string ret = to_string(line) + ": ELIF (" + ifTrue.print() + ") ->\n";
     ret += ss.print();
     return ret;
 }
@@ -66,7 +66,7 @@ string Elifs::print() {
 }
 
 string IfStatement::print() {
-    string ret = to_string(line) + ": IF (" + ifTrue.str + ") ->\n";
+    string ret = to_string(line) + ": IF (" + ifTrue.print() + ") ->\n";
     ret += stmts.print();
     ret += elifs.print();
     ret += el.print();

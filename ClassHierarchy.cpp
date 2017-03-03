@@ -257,20 +257,14 @@ void ClassTreeNode::populateScopes(ClassTreeNode *AST) {
     Scope currentClassScope;
     constructorScope.addFormalArgs(fArgs);
     constructorScope.tokens["this"] = className;
-    int pass1 = 1;
     do {
-        cout << "Processing class " << className << endl;
-        cout << "Pass: " << pass1 << endl;
-        cout << "Class Scope:" << endl;
-        scope.print();
-        cout << "Constructor Scope: " << endl;
-        constructorScope.print();
+        do {
+            currentClassScope = scope;
+            currentScope = constructorScope;
 
-        currentClassScope = scope;
-        currentScope = constructorScope;
-
-        // First we process the constructor
-        updateScope(stmts, AST, constructorScope, scope, true);
+            // First we process the constructor
+            updateScope(stmts, AST, constructorScope, scope, true);
+        } while(currentScope.tokens != constructorScope.tokens || currentClassScope.tokens != scope.tokens);
 
         // Now we process each method
         for (auto m = methods.methods.begin(); m != methods.methods.end(); ++m) {
@@ -278,26 +272,13 @@ void ClassTreeNode::populateScopes(ClassTreeNode *AST) {
             Scope classScopeCopy;
             m->scope.addFormalArgs(m->fArgs);
             m->scope.tokens["this"] = className;
-            int pass2 = 1;
             do {
-                cout << "Processing method " << m->name << endl;
-                cout << "Pass: " << pass2 << endl;
-                cout << "Class Scope:" << endl;
-                scope.print();
-                cout << "Method Scope:" << endl;
-                m->scope.print();
-
                 methodScope = m->scope;
                 classScopeCopy = scope;
                 updateScope(m->stmts, AST, m->scope, scope, false);
-                ++pass2;
-                cout << endl;
-            } while(methodScope.tokens != m->scope.tokens && classScopeCopy.tokens != scope.tokens);
+            } while(methodScope.tokens != m->scope.tokens || classScopeCopy.tokens != scope.tokens);
         }
-        cout << endl;
-        cout << endl;
-        ++pass1;
-    } while(currentScope.tokens != constructorScope.tokens && currentClassScope.tokens != scope.tokens);
+    } while(currentScope.tokens != constructorScope.tokens || currentClassScope.tokens != scope.tokens);
 }
 
 string leastCommonAncestor(ClassTreeNode *c1, ClassTreeNode *c2) {
