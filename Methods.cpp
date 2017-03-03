@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <map>
 
 using namespace std;
 
@@ -40,4 +41,16 @@ ostream &operator<<(ostream &os, const FormalArgs &formalArgs) {
     });
 
     return os;
+}
+
+void Scope::addFormalArgs(const FormalArgs &fArgs) {
+    for_each(fArgs.fArgs.begin(), fArgs.fArgs.end(), [&] (FormalArg arg) {
+        tokens[arg.var] = arg.type;
+    });
+}
+
+void Scope::print() {
+    for_each(tokens.begin(), tokens.end(), [] (pair<string, string> entry) {
+        cout << entry.first << ": " << entry.second << endl;
+    });
 }

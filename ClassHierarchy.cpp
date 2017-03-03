@@ -254,24 +254,48 @@ string ClassTreeNode::returnTypeForFunction(string name, list<string> argTypes) 
 
 void ClassTreeNode::populateScopes(ClassTreeNode *AST) {
     Scope currentScope;
+    Scope currentClassScope;
+    constructorScope.addFormalArgs(fArgs);
+    int pass1 = 1;
     do {
         cout << "Processing class " << className << endl;
-        currentScope = scope;
+        cout << "Pass: " << pass1 << endl;
+        cout << "Class Scope:" << endl;
+        scope.print();
+        cout << "Constructor Scope: " << endl;
+        constructorScope.print();
+
+        currentClassScope = scope;
+        currentScope = constructorScope;
 
         // First we process the constructor
         updateScope(stmts, AST, constructorScope, scope, true);
 
         // Now we process each method
         for (auto m = methods.methods.begin(); m != methods.methods.end(); ++m) {
-            cout << "Processing method " << m->name << endl;
             Scope methodScope;
+            Scope classScopeCopy;
+            m->scope.addFormalArgs(m->fArgs);
+            int pass2 = 1;
             do {
+                cout << "Processing method " << m->name << endl;
+                cout << "Pass: " << pass2 << endl;
+                cout << "Class Scope:" << endl;
+                scope.print();
+                cout << "Method Scope:" << endl;
+                m->scope.print();
+
                 methodScope = m->scope;
+                classScopeCopy = scope;
                 updateScope(m->stmts, AST, m->scope, scope, false);
-            } while(methodScope.tokens != m->scope.tokens);
+                ++pass2;
+                cout << endl;
+            } while(methodScope.tokens != m->scope.tokens && classScopeCopy.tokens != scope.tokens);
         }
         cout << endl;
-    } while(currentScope.tokens != scope.tokens);
+        cout << endl;
+        ++pass1;
+    } while(currentScope.tokens != constructorScope.tokens && currentClassScope.tokens != scope.tokens);
 }
 
 string leastCommonAncestor(ClassTreeNode *c1, ClassTreeNode *c2) {
@@ -293,27 +317,6 @@ string leastCommonAncestor(ClassTreeNode *c1, ClassTreeNode *c2) {
     }
 
     return "Obj";
-}
-
-void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
-    Scope &classScope, bool inConstructor) {}
-
-void computeAllScopes(ClassTreeNode *AST) {
-    queue<ClassTreeNode *> toProcess;
-    toProcess.push(AST);
-
-    while (!toProcess.empty()) {
-        ClassTreeNode *current = toProcess.front();
-        toProcess.pop();
-
-        // Compute scopes
-        current->populateScopes(AST);
-        // Add subclasses
-        for_each(current->subclasses.begin(), current->subclasses.end(),
-            [&] (ClassTreeNode *subclass) {
-                toProcess.push(subclass);
-        });
-    }
 }
 
 void makeSureTableIsEmpty(const Classes &cls) {

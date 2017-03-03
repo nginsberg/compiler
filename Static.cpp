@@ -1,5 +1,6 @@
 #include <string>
 #include <algorithm>
+#include <queue>
 
 #include "Expressions.h"
 #include "ClassHierarchy.h"
@@ -98,3 +99,25 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,
     }
     return unknown;
 }
+
+void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
+    Scope &classScope, bool inConstructor) {}
+
+void computeAllScopes(ClassTreeNode *AST) {
+    queue<ClassTreeNode *> toProcess;
+    toProcess.push(AST);
+
+    while (!toProcess.empty()) {
+        ClassTreeNode *current = toProcess.front();
+        toProcess.pop();
+
+        // Compute scopes
+        current->populateScopes(AST);
+        // Add subclasses
+        for_each(current->subclasses.begin(), current->subclasses.end(),
+            [&] (ClassTreeNode *subclass) {
+                toProcess.push(subclass);
+        });
+    }
+}
+
