@@ -69,6 +69,9 @@ public:
     std::string returnTypeForFunction(std::string name,
         std::list<std::string> argTypes);
 
+    // Calculate the scope for the class and its methods.
+    void populateScopes(ClassTreeNode *AST);
+
     std::list<ClassTreeNode *> subclasses;
     ClassTreeNode *superclass;
 
@@ -84,6 +87,11 @@ std::string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,
     const Scope &classScope = Scope());
 
 std::string leastCommonAncestor(ClassTreeNode *c1, ClassTreeNode *c2);
+
+void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
+    Scope &classScope, bool inConstructor);
+
+void computeAllScopes(ClassTreeNode *AST);
 
 std::ostream &operator<<(std::ostream &os, const ClassTreeNode &ctn);
 

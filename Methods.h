@@ -37,7 +37,7 @@ public:
 class Method {
 public:
     Method(std::string n, FormalArgs args, std::string r, Statements ss, int l):
-        name(n), retType(r), fArgs(args), stmts(ss), line(l), classScope(NULL) {}
+        name(n), retType(r), fArgs(args), stmts(ss), line(l) {}
     std::string name;
     std::string retType;
     FormalArgs fArgs;
@@ -45,7 +45,6 @@ public:
     int line;
 
     Scope scope;
-    Scope *classScope;
 };
 
 std::ostream &operator<<(std::ostream &os, const Method &mthd);

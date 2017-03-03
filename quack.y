@@ -437,6 +437,8 @@ int main(int argc, char** argv) {
         }
         });
 
+
+    computeAllScopes(&classHierarchy);
     return 0;
 }
 

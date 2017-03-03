@@ -122,11 +122,7 @@ ClassTreeNode::ClassTreeNode(Classes &cls) {
                     new ClassTreeNode(iter->cs.className, iter->cs.fArgs,
                         iter->cs.line, iter->cb.mthds, iter->cb.stmts);
                 currentClass->superclass = current;
-                // Set the class scope of all the methods to point to this class
-                for (auto m = currentClass->methods.methods.begin();
-                    m != currentClass->methods.methods.end(); ++m) {
-                    m->classScope = &(currentClass->scope);
-                }
+
                 // Add it as a subclass
                 current->subclasses.push_back(currentClass);
                 nodesToSearch.push(currentClass); // Add it to search
@@ -256,6 +252,28 @@ string ClassTreeNode::returnTypeForFunction(string name, list<string> argTypes) 
     return "";
 }
 
+void ClassTreeNode::populateScopes(ClassTreeNode *AST) {
+    Scope currentScope;
+    do {
+        cout << "Processing class " << className << endl;
+        currentScope = scope;
+
+        // First we process the constructor
+        updateScope(stmts, AST, constructorScope, scope, true);
+
+        // Now we process each method
+        for (auto m = methods.methods.begin(); m != methods.methods.end(); ++m) {
+            cout << "Processing method " << m->name << endl;
+            Scope methodScope;
+            do {
+                methodScope = m->scope;
+                updateScope(m->stmts, AST, m->scope, scope, false);
+            } while(methodScope.tokens != m->scope.tokens);
+        }
+        cout << endl;
+    } while(currentScope.tokens != scope.tokens);
+}
+
 string leastCommonAncestor(ClassTreeNode *c1, ClassTreeNode *c2) {
     // First we get the superchain of each class
     list<ClassTreeNode *>s1 = c1->superChain();
@@ -277,6 +295,27 @@ string leastCommonAncestor(ClassTreeNode *c1, ClassTreeNode *c2) {
     return "Obj";
 }
 
+void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
+    Scope &classScope, bool inConstructor) {}
+
+void computeAllScopes(ClassTreeNode *AST) {
+    queue<ClassTreeNode *> toProcess;
+    toProcess.push(AST);
+
+    while (!toProcess.empty()) {
+        ClassTreeNode *current = toProcess.front();
+        toProcess.pop();
+
+        // Compute scopes
+        current->populateScopes(AST);
+        // Add subclasses
+        for_each(current->subclasses.begin(), current->subclasses.end(),
+            [&] (ClassTreeNode *subclass) {
+                toProcess.push(subclass);
+        });
+    }
+}
+
 void makeSureTableIsEmpty(const Classes &cls) {
     if (!cls.classes.empty()) {
         for_each(cls.classes.begin(), cls.classes.end(),
@@ -289,3 +328,18 @@ void makeSureTableIsEmpty(const Classes &cls) {
         exit(-1);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

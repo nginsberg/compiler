@@ -16,7 +16,7 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,
         return "Int";
     } else if (ConstructorCall *call = dynamic_cast<ConstructorCall *>(expr)) {
         if (AST->classFromName(call->className)) { return call->className; }
-        cerr << "Error: " << call->line << ": Call to coonstructor for class "
+        cerr << "Error: " << call->line << ": Call to constructor for class "
             << call->className << " when " << call->className << " was never "
             << "definded." << endl;
         return unknown;
