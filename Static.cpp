@@ -7,9 +7,10 @@
 
 using namespace std;
 
-string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,
-        const Scope &classScope) {
-    string unknown = "$Unknown";
+static string unknown = "$Unknown";
+static string returnToken = "$return";
+
+string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope, const Scope &classScope) {
 
     if(StringLit *strLit = dynamic_cast<StringLit *>(expr)) {
         return "String";
@@ -28,14 +29,15 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,
             // that, and then look up the ident in the class scope.
 
             // Make sure we are in a class (not global scope)
-            if (classScope.tokens.find("this") == classScope.tokens.end()) {
+            if (scope.tokens.find("this") == scope.tokens.end()) {
+                cout << lexpr->print() << endl;
                 cerr << "Error: " << lexpr->line << ": Attempt to access "
                     << " member value from global scope." << endl;
                 return unknown;
             }
 
             // Make sure we are attempting to access data from the same class
-            string thisType = classScope.tokens.find("this")->second;
+            string thisType = scope.tokens.find("this")->second;
             string otherType = type(lexpr->expr, AST, scope, classScope);
             if (thisType != otherType) {
                 cerr << "Error: " << lexpr->line << ": Attempt to access "
@@ -49,6 +51,8 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,
                 cerr << "Error: " << lexpr->line << ": Class " << thisType
                     << " does not have a member value named " << lexpr->ident
                     << endl;
+                cout << "Class scope:" << endl;
+                classScope.print();
                 return unknown;
             }
 
@@ -66,7 +70,7 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,
         }
     } else if (FunctionCall *call = dynamic_cast<FunctionCall *>(expr)) {
         // Get the name of the class
-        string className = type(call->expr, AST, scope);
+        string className = type(call->expr, AST, scope, classScope);
         if (className == unknown) {
             cerr << "Error: " << call->line << ": Attempt to call function "
                 << call->functionName << " on " << call->expr->print()
@@ -78,7 +82,7 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,
         ClassTreeNode *cl = AST->classFromName(className);
         if (!cl) {
             cerr << "Error: " << call->line << ": Class " << className
-                << " is not definded." << endl;
+                << " is not defined." << endl;
             return unknown;
         }
 
@@ -123,6 +127,11 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
 
             // Determine the new type
             string t = type(assignment->from, AST, scope, classScope);
+            if (t == unknown) {
+                cerr << "Error: " << assignment->line << ": Cannot determine "
+                    << "type of rexpr " << assignment->from->print() << endl;
+                return;
+            }
 
             // Add it to the proper scope.
             auto var = usedScope->tokens.find(assignment->to->ident);
@@ -138,6 +147,23 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
                 ClassTreeNode *c1 = AST->classFromName(var->second);
                 ClassTreeNode *c2 = AST->classFromName(t);
                 usedScope->tokens[assignment->to->ident] = leastCommonAncestor(c1, c2);
+            }
+        } else if (ReturnStatement *retSatement = dynamic_cast<ReturnStatement *>(stmnt)) {
+            string t = type(retSatement->ret, AST, scope, classScope);
+            if (t == unknown) {
+                cerr << "Error: " << retSatement->line << ": Cannot determine "
+                    << "type of rexpr " << retSatement->ret->print() << endl;
+                return;
+            }
+
+            // Figure out if we've encountered a return statement before
+            auto var = scope.tokens.find(returnToken);
+            if (var == scope.tokens.end()) {
+                scope.tokens[returnToken] = t;
+            } else {
+                ClassTreeNode *c1 = AST->classFromName(var->second);
+                ClassTreeNode *c2 = AST->classFromName(t);
+                scope.tokens[returnToken] = leastCommonAncestor(c1, c2);
             }
         }
     });

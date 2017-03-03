@@ -33,7 +33,7 @@ class Scope {
 public:
     std::map<std::string, std::string> tokens;
     void addFormalArgs(const FormalArgs &fArgs);
-    void print();
+    void print() const;
 };
 
 class Method {

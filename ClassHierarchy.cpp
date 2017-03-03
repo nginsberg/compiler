@@ -43,17 +43,47 @@ ostream &operator<<(ostream &os, const ClassBody &classBody) {
 ClassTreeNode::ClassTreeNode(Classes &cls) {
     this->className = "Obj"; // We are root
     this->line = 0;
+    this->superclass = NULL;
+    Methods objMethods;
+    objMethods.methods.push_back(Method("STR", FormalArgs(), "String", Statements(), 0));
+    objMethods.methods.push_back(Method("EQUAL",
+        FormalArgs(FormalArg("other", "Obj")), "Boolean", Statements(), 0));
+    objMethods.methods.push_back(Method("PRINT", FormalArgs(), "Nothing", Statements(), 0));
+    methods = objMethods;
 
     // Add default subclasses
     ClassTreeNode *nothing = new ClassTreeNode("Nothing", FormalArgs(), 0, Methods(), Statements());
     nothing->superclass = this;
     this->subclasses.push_back(nothing);
+
     ClassTreeNode *intClass = new ClassTreeNode("Int", FormalArgs(), 0, Methods(), Statements());
     intClass->superclass = this;
+    Methods intMethods;
+    intMethods.methods.push_back(Method("PLUS",
+        FormalArgs(FormalArg("other", "Int")), "Int", Statements(), 0));
+    intMethods.methods.push_back(Method("MINUS",
+        FormalArgs(FormalArg("other", "Int")), "Int", Statements(), 0));
+    intMethods.methods.push_back(Method("TIMES",
+        FormalArgs(FormalArg("other", "Int")), "Int", Statements(), 0));
+    intMethods.methods.push_back(Method("DIVIDE",
+        FormalArgs(FormalArg("other", "Int")), "Int", Statements(), 0));
+    intMethods.methods.push_back(Method("ATMOST",
+        FormalArgs(FormalArg("other", "Int")), "Boolean", Statements(), 0));
+    intMethods.methods.push_back(Method("LESS",
+        FormalArgs(FormalArg("other", "Int")), "Boolean", Statements(), 0));
+    intMethods.methods.push_back(Method("ATLEAST",
+        FormalArgs(FormalArg("other", "Int")), "Boolean", Statements(), 0));
+    intMethods.methods.push_back(Method("MORE",
+        FormalArgs(FormalArg("other", "Int")), "Boolean", Statements(), 0));
+    intMethods.methods.push_back(Method("EQUALS",
+        FormalArgs(FormalArg("other", "Int")), "Boolean", Statements(), 0));
+    intClass->methods = intMethods;
     this->subclasses.push_back(intClass);
+
     ClassTreeNode *stringClass = new ClassTreeNode("String", FormalArgs(), 0, Methods(), Statements());
     stringClass->superclass = this;
     this->subclasses.push_back(stringClass);
+
     ClassTreeNode *boolClass = new ClassTreeNode("Boolean", FormalArgs(), 0, Methods(), Statements());
     boolClass->superclass = this;
     this->subclasses.push_back(boolClass);

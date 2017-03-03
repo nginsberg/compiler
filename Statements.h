@@ -39,9 +39,9 @@ public:
 
 class ReturnStatement : public Statement {
 public:
-    ReturnStatement(int l, RExpr r): Statement(l), ret(r) {}
+    ReturnStatement(int l, RExpr *r): Statement(l), ret(r) {}
     std::string print() override;
-    RExpr ret;
+    RExpr *ret;
 };
 
 class WhileStatement : public Statement {

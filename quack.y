@@ -254,7 +254,7 @@ statement:
 // Return
 statement:
     RETURN optional_r_expr ';' {
-        $$ = new ReturnStatement(yylineno, *$2);
+        $$ = new ReturnStatement(yylineno, $2);
     }
     ;
 optional_r_expr:

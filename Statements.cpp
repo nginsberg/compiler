@@ -35,7 +35,7 @@ string AssignStatement::print() {
 }
 
 string ReturnStatement::print() {
-    string ret = to_string(line) + ": RET -> " + this->ret.print();
+    string ret = to_string(line) + ": RET -> " + this->ret->print();
     return ret;
 }
 

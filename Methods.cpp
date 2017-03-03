@@ -49,7 +49,7 @@ void Scope::addFormalArgs(const FormalArgs &fArgs) {
     });
 }
 
-void Scope::print() {
+void Scope::print() const {
     for_each(tokens.begin(), tokens.end(), [] (pair<string, string> entry) {
         cout << entry.first << ": " << entry.second << endl;
     });
