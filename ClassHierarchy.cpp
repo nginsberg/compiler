@@ -256,6 +256,7 @@ void ClassTreeNode::populateScopes(ClassTreeNode *AST) {
     Scope currentScope;
     Scope currentClassScope;
     constructorScope.addFormalArgs(fArgs);
+    constructorScope.tokens["this"] = className;
     int pass1 = 1;
     do {
         cout << "Processing class " << className << endl;
@@ -276,6 +277,7 @@ void ClassTreeNode::populateScopes(ClassTreeNode *AST) {
             Scope methodScope;
             Scope classScopeCopy;
             m->scope.addFormalArgs(m->fArgs);
+            m->scope.tokens["this"] = className;
             int pass2 = 1;
             do {
                 cout << "Processing method " << m->name << endl;
