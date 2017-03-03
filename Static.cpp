@@ -173,6 +173,33 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
                     << "type of rexpr " << bareStatement->expr->print() << endl;
                 return;
             }
+        } else if (WhileStatement *whileStatement = dynamic_cast<WhileStatement *>(stmnt)) {
+            // First we check to make sure the conditional is a subclass of Boolean
+            string t = type(whileStatement->ifTrue, AST, scope, classScope);
+            if (t == unknown) {
+                cerr << "Error: " << whileStatement->line << ":  Cannot determine "
+                    << "type of rexpr " << whileStatement->ifTrue->print() << endl;
+                return;
+            }
+            ClassTreeNode *cl = AST->classFromName(t);
+            if (!cl->inheritsFrom("Boolean")) {
+                cerr << "Error: " << whileStatement->line << ": Conditional "
+                    << "must have a type that inherits from Boolean, which "
+                    << t << " does not" << endl;
+                return;
+            }
+
+            // Now we make copies of the scope and update the copies until they
+            // are stable. Then we throw the copies away, since the while loop
+            // may never execute, but we want to make sure there are no errors
+            Scope scopeCopy;
+            Scope classScopeCopy;
+            do {
+                scopeCopy = scope;
+                classScopeCopy = classScope;
+
+                updateScope(whileStatement->block, AST, scopeCopy, classScopeCopy, inConstructor);
+            } while (scope.tokens != scopeCopy.tokens || classScope.tokens != classScopeCopy.tokens);
         }
     });
 }

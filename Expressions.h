@@ -67,32 +67,6 @@ public:
     ActualArgs args;
 };
 
-class AndExpr : public RExpr {
-public:
-    AndExpr(int l, RExpr *f, RExpr *s): RExpr("", l), first(f), second(s) {}
-    std::string print() override;
-
-    RExpr *first;
-    RExpr *second;
-};
-
-class OrExpr : public RExpr {
-public:
-    OrExpr(int l, RExpr *f, RExpr *s): RExpr("", l), first(f), second(s) {}
-    std::string print() override;
-
-    RExpr *first;
-    RExpr *second;
-};
-
-class NotExpr : public RExpr {
-public:
-    NotExpr(int l, RExpr *e): RExpr("", l), expr(e) {}
-    std::string print() override;
-
-    RExpr *expr;
-};
-
 #endif
 
 

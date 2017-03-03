@@ -107,8 +107,9 @@ ClassTreeNode::ClassTreeNode(Classes &cls) {
         FormalArgs(FormalArg("other", "Boolean")), "Boolean", Statements(), 0));
     boolMethods.methods.push_back(Method("AND",
         FormalArgs(FormalArg("other", "Boolean")), "Boolean", Statements(), 0));
-    boolMethods.methods.push_back(Method("NOT",
-        FormalArgs(FormalArg("other", "Boolean")), "Boolean", Statements(), 0));
+    boolMethods.methods.push_back(Method("NOT", FormalArgs(), "Boolean",
+        Statements(), 0));
+    boolClass->methods = boolMethods;
     this->subclasses.push_back(boolClass);
 
     // First we check to make sure no class is defined multiple times
@@ -332,6 +333,15 @@ void ClassTreeNode::populateScopes(ClassTreeNode *AST) {
             } while(methodScope.tokens != m->scope.tokens || classScopeCopy.tokens != scope.tokens);
         }
     } while(currentScope.tokens != constructorScope.tokens || currentClassScope.tokens != scope.tokens);
+}
+
+bool ClassTreeNode::inheritsFrom(string possibleSuper) {
+    list<ClassTreeNode *>chain = superChain();
+    chain.push_front(this);
+    for (auto cl = chain.begin(); cl != chain.end(); ++cl) {
+        if ((*cl)->className == possibleSuper) { return true; }
+    }
+    return false;
 }
 
 string leastCommonAncestor(ClassTreeNode *c1, ClassTreeNode *c2) {

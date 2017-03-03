@@ -30,15 +30,3 @@ string ActualArgs::print() {
     });
     return ret;
 }
-
-string AndExpr::print() {
-    return first->print() + " && " + second->print();
-}
-
-string OrExpr::print() {
-    return first->print() + " || " + second->print();
-}
-
-string NotExpr::print() {
-    return "NOT " + expr->print();
-}

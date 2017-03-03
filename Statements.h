@@ -46,10 +46,10 @@ public:
 
 class WhileStatement : public Statement {
 public:
-    WhileStatement(int l, RExpr it, Statements bl): Statement(l), ifTrue(it),
+    WhileStatement(int l, RExpr *it, Statements bl): Statement(l), ifTrue(it),
         block(bl) {}
     std::string print() override;
-    RExpr ifTrue;
+    RExpr *ifTrue;
     Statements block;
 };
 

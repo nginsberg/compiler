@@ -5,6 +5,7 @@
 class Pt(x: Int, y: Int) {
   this.x = x;
   this.y = y;
+  this.b = Boolean();
 
   def STR() : String {
       return this.x + this.y;
@@ -15,7 +16,7 @@ class Pt(x: Int, y: Int) {
   }
 
   def upWhile() {
-      while (not this.x) {
+      while (not this.b) {
           if (this.x < this.y) {
               this.x = this.x + 1;
           } elif (this.x + 1 == this.y) {

@@ -25,7 +25,7 @@ string Statements::node(string lblName) const {
 }
 
 string BareStatement::print() {
-    string ret = to_string(line) + ": " + expr.print();
+    string ret = to_string(line) + ": " + expr->print();
     return ret;
 }
 
@@ -40,7 +40,7 @@ string ReturnStatement::print() {
 }
 
 string WhileStatement::print() {
-    string ret = to_string(line) + ": WHILE (" + ifTrue.print() + ") ->\n";
+    string ret = to_string(line) + ": WHILE (" + ifTrue->print() + ") ->\n";
     ret += block.print();
     return ret;
 }

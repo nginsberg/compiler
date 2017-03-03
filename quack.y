@@ -248,7 +248,7 @@ else:
 
 statement:
     WHILE r_expr statement_block {
-        $$ = new WhileStatement(yylineno, *$2, *$3);
+        $$ = new WhileStatement(yylineno, $2, *$3);
     }
 
 // Return
@@ -355,13 +355,17 @@ r_expr:
         $$ = new FunctionCall(yylineno, $1, "MORE", as);
     }
     | r_expr AND r_expr {
-        $$ = new AndExpr(yylineno, $1, $3);
+        ActualArgs as;
+        as.args.push_back($3);
+        $$ = new FunctionCall(yylineno, $1, "AND", as);
     }
     | r_expr OR r_expr {
-        $$ = new OrExpr(yylineno, $1, $3);
+        ActualArgs as;
+        as.args.push_back($3);
+        $$ = new FunctionCall(yylineno, $1, "OR", as);
     }
     | NOT r_expr {
-        $$ = new NotExpr(yylineno, $2);
+        $$ = new FunctionCall(yylineno, $2, "NOT", ActualArgs());
     }
     | r_expr '.' ident '(' actual_args ')' {
         $$ = new FunctionCall(yylineno, $1, $3, *$5);

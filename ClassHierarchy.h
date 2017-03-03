@@ -72,6 +72,8 @@ public:
     // Calculate the scope for the class and its methods.
     void populateScopes(ClassTreeNode *AST);
 
+    bool inheritsFrom(std::string possibleSuper);
+
     std::list<ClassTreeNode *> subclasses;
     ClassTreeNode *superclass;
 
