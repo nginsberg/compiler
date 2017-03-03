@@ -82,10 +82,33 @@ ClassTreeNode::ClassTreeNode(Classes &cls) {
 
     ClassTreeNode *stringClass = new ClassTreeNode("String", FormalArgs(), 0, Methods(), Statements());
     stringClass->superclass = this;
+    Methods stringMethods;
+    stringMethods.methods.push_back(Method("PLUS",
+        FormalArgs(FormalArg("other", "String")), "String", Statements(), 0));
+    stringMethods.methods.push_back(Method("ATMOST",
+        FormalArgs(FormalArg("other", "String")), "Boolean", Statements(), 0));
+    stringMethods.methods.push_back(Method("LESS",
+        FormalArgs(FormalArg("other", "String")), "Boolean", Statements(), 0));
+    stringMethods.methods.push_back(Method("ATLEAST",
+        FormalArgs(FormalArg("other", "String")), "Boolean", Statements(), 0));
+    stringMethods.methods.push_back(Method("MORE",
+        FormalArgs(FormalArg("other", "String")), "Boolean", Statements(), 0));
+    stringMethods.methods.push_back(Method("EQUALS",
+        FormalArgs(FormalArg("other", "String")), "Boolean", Statements(), 0));
+    stringClass->methods = stringMethods;
     this->subclasses.push_back(stringClass);
 
     ClassTreeNode *boolClass = new ClassTreeNode("Boolean", FormalArgs(), 0, Methods(), Statements());
     boolClass->superclass = this;
+    Methods boolMethods;
+    boolMethods.methods.push_back(Method("EQUALS",
+        FormalArgs(FormalArg("other", "Boolean")), "Boolean", Statements(), 0));
+    boolMethods.methods.push_back(Method("OR",
+        FormalArgs(FormalArg("other", "Boolean")), "Boolean", Statements(), 0));
+    boolMethods.methods.push_back(Method("AND",
+        FormalArgs(FormalArg("other", "Boolean")), "Boolean", Statements(), 0));
+    boolMethods.methods.push_back(Method("NOT",
+        FormalArgs(FormalArg("other", "Boolean")), "Boolean", Statements(), 0));
     this->subclasses.push_back(boolClass);
 
     // First we check to make sure no class is defined multiple times

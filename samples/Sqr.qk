@@ -59,4 +59,3 @@ a_square.PRINT();
 boo = "boo";
 num = 3;
 num = "boo";
-test = FakeClass();
