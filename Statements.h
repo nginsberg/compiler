@@ -24,9 +24,9 @@ public:
 
 class BareStatement : public Statement {
 public:
-    BareStatement(int l, RExpr e): Statement(l), expr(e) {}
+    BareStatement(int l, RExpr *e): Statement(l), expr(e) {}
     std::string print() override;
-    RExpr expr;
+    RExpr *expr;
 };
 
 class AssignStatement : public Statement {

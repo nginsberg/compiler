@@ -165,6 +165,14 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
                 ClassTreeNode *c2 = AST->classFromName(t);
                 scope.tokens[returnToken] = leastCommonAncestor(c1, c2);
             }
+        } else if (BareStatement *bareStatement = dynamic_cast<BareStatement *>(stmnt)) {
+            // We just have to check to make sure we can get a type for the rexpr
+            string t = type(bareStatement->expr, AST, scope, classScope);
+            if (t == unknown) {
+                cerr << "Error: " << bareStatement->line << ": Cannot determine "
+                    << "type of rexpr " << bareStatement->expr->print() << endl;
+                return;
+            }
         }
     });
 }

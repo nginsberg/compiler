@@ -276,7 +276,7 @@ statement:
 // Bare Expressions
 statement:
     r_expr ';' {
-        $$ = new BareStatement(yylineno, *$1);
+        $$ = new BareStatement(yylineno, $1);
     }
     ;
 
