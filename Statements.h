@@ -62,10 +62,10 @@ public:
 
 class ElifStatement : public Statement {
 public:
-    ElifStatement(int l, RExpr it, Statements s): Statement(l), ifTrue(it),
+    ElifStatement(int l, RExpr *it, Statements s): Statement(l), ifTrue(it),
         ss(s) {}
     std::string print() override;
-    RExpr ifTrue;
+    RExpr *ifTrue;
     Statements ss;
 };
 
@@ -79,10 +79,10 @@ public:
 
 class IfStatement : public Statement {
 public:
-    IfStatement(int l, RExpr it, Statements ss, Elifs els, ElseStatement e):
+    IfStatement(int l, RExpr *it, Statements ss, Elifs els, ElseStatement e):
         Statement(l), ifTrue(it), stmts(ss), elifs(els), el(e) {}
     std::string print() override;
-    RExpr ifTrue;
+    RExpr *ifTrue;
     Statements stmts;
     Elifs elifs;
     ElseStatement el;

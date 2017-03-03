@@ -52,7 +52,7 @@ string ElseStatement::print() {
 }
 
 string ElifStatement::print() {
-    string ret = to_string(line) + ": ELIF (" + ifTrue.print() + ") ->\n";
+    string ret = to_string(line) + ": ELIF (" + ifTrue->print() + ") ->\n";
     ret += ss.print();
     return ret;
 }
@@ -66,7 +66,7 @@ string Elifs::print() {
 }
 
 string IfStatement::print() {
-    string ret = to_string(line) + ": IF (" + ifTrue.print() + ") ->\n";
+    string ret = to_string(line) + ": IF (" + ifTrue->print() + ") ->\n";
     ret += stmts.print();
     ret += elifs.print();
     ret += el.print();

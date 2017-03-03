@@ -219,7 +219,7 @@ statement:
         Statements *stmts = dynamic_cast<Statements *>$3;
         Elifs *elifs = dynamic_cast<Elifs *>$4;
         ElseStatement *el = dynamic_cast<ElseStatement *>$5;
-        $$ = new IfStatement(yylineno, *ifTrue, *stmts, *elifs, *el);
+        $$ = new IfStatement(yylineno, ifTrue, *stmts, *elifs, *el);
     }
 elifs:
     /* empty */ {
@@ -234,7 +234,7 @@ elifs:
     ;
 elif:
     ELIF r_expr statement_block {
-        $$ = new ElifStatement(yylineno, *$2, *$3);
+        $$ = new ElifStatement(yylineno, $2, *$3);
     }
     ;
 else:

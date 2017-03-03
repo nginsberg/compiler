@@ -200,6 +200,77 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
 
                 updateScope(whileStatement->block, AST, scopeCopy, classScopeCopy, inConstructor);
             } while (scope.tokens != scopeCopy.tokens || classScope.tokens != classScopeCopy.tokens);
+        } else if (IfStatement *ifStatement = dynamic_cast<IfStatement *>(stmnt)) {
+            // First we check all the conditionals and make sure they inherit
+            // from Boolean
+
+            string t = type(ifStatement->ifTrue, AST, scope, classScope);
+            if (t == unknown) {
+                cerr << "Error: " << ifStatement->line << ":  Cannot determine "
+                    << "type of rexpr " << ifStatement->ifTrue->print() << endl;
+                return;
+            }
+            ClassTreeNode *cl = AST->classFromName(t);
+            if (!cl->inheritsFrom("Boolean")) {
+                cerr << "Error: " << whileStatement->line << ": Conditional "
+                    << "must have a type that inherits from Boolean, which "
+                    << t << " does not" << endl;
+                return;
+            }
+
+            for_each(ifStatement->elifs.elifs.begin(), ifStatement->elifs.elifs.end(),
+                [&] (ElifStatement s) {
+                    string t = type(s.ifTrue, AST, scope, classScope);
+                    if (t == unknown) {
+                        cerr << "Error: " << s.line << ":  Cannot determine "
+                            << "type of rexpr " << s.ifTrue->print() << endl;
+                        return;
+                    }
+                    ClassTreeNode *cl = AST->classFromName(t);
+                    if (!cl->inheritsFrom("Boolean")) {
+                        cerr << "Error: " << whileStatement->line << ": Conditional "
+                            << "must have a type that inherits from Boolean, which "
+                            << t << " does not" << endl;
+                        return;
+                    }
+            });
+
+            // We are going to calculate what the scopes would be on each
+            // branch of the if statement, and then intersect them.
+            list<Scope> scopes;
+            list<Scope> classScopes;
+
+            Scope scopeCopy;
+            Scope classScopeCopy;
+            do {
+                scopeCopy = scope;
+                classScopeCopy = classScope;
+
+                updateScope(ifStatement->stmts, AST, scopeCopy, classScopeCopy, inConstructor);
+            } while (scope.tokens != scopeCopy.tokens || classScope.tokens != classScopeCopy.tokens);
+            scopes.push_back(scopeCopy);
+            classScopes.push_back(classScopeCopy);
+
+            for_each(ifStatement->elifs.elifs.begin(), ifStatement->elifs.elifs.end(),
+                [&] (ElifStatement s) {
+                    do {
+                        scopeCopy = scope;
+                        classScopeCopy = classScope;
+
+                        updateScope(s.ss, AST, scopeCopy, classScopeCopy, inConstructor);
+                    } while (scope.tokens != scopeCopy.tokens || classScope.tokens != classScopeCopy.tokens);
+                    scopes.push_back(scopeCopy);
+                    classScopes.push_back(classScopeCopy);
+            });
+
+            do {
+                scopeCopy = scope;
+                classScopeCopy = classScope;
+
+                updateScope(ifStatement->el.ss, AST, scopeCopy, classScopeCopy, inConstructor);
+            } while (scope.tokens != scopeCopy.tokens || classScope.tokens != classScopeCopy.tokens);
+            scopes.push_back(scopeCopy);
+            classScopes.push_back(classScopeCopy);
         }
     });
 }
