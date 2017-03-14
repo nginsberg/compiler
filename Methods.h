@@ -45,6 +45,7 @@ std::ostream &operator<<(std::ostream &os, const Method &mthd);
 class Methods {
 public:
     std::list<Method> methods;
+    bool determineIfUnique();
 };
 
 std::ostream &operator<<(std::ostream &os, const Methods &mthds);

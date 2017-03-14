@@ -95,6 +95,8 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
 
 void computeAllScopes(ClassTreeNode *AST);
 
+bool checkAllMethods(ClassTreeNode *AST);
+
 std::ostream &operator<<(std::ostream &os, const ClassTreeNode &ctn);
 
 void makeSureTableIsEmpty(const Classes &cls);

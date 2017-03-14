@@ -442,15 +442,13 @@ int main(int argc, char** argv) {
     makeSureTableIsEmpty(*cls); // Everything should be in classHierarchy
 
     computeAllScopes(&classHierarchy);
+    checkAllMethods(&classHierarchy);
 
     Scope mainScope, scopeCopy, emptyScope;
     do {
         scopeCopy = mainScope;
         updateScope(*stmts, &classHierarchy, mainScope, emptyScope, false);
     } while (scopeCopy.tokens != mainScope.tokens);
-    cout << "After processing main scope:" << endl;
-    mainScope.print();
-    cout << endl;
 
     return 0;
 }

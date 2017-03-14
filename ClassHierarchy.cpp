@@ -321,13 +321,6 @@ void ClassTreeNode::populateScopes(ClassTreeNode *AST) {
             updateScope(stmts, AST, stmts.scope, scope, true);
         } while(currentScope.tokens != stmts.scope.tokens || currentClassScope.tokens != scope.tokens);
         stmts.scope.addReturn();
-        cout << "After Processing Constructor:" << endl;
-        cout << "Class Scope:" << endl;
-        scope.print();
-        cout << endl;
-        cout << "Constructor Scope:" << endl;
-        stmts.scope.print();
-        cout << endl;
 
         // Now we process each method
         for (auto m = methods.methods.begin(); m != methods.methods.end(); ++m) {
@@ -341,13 +334,6 @@ void ClassTreeNode::populateScopes(ClassTreeNode *AST) {
                 updateScope(m->stmts, AST, m->stmts.scope, scope, false);
             } while(methodScope.tokens != m->stmts.scope.tokens || classScopeCopy.tokens != scope.tokens);
             m->stmts.scope.addReturn();
-            cout << "After Processing Method " << m->name << ":" << endl;
-            cout << "Class Scope:" << endl;
-            scope.print();
-            cout << endl;
-            cout << "Method Scope:" << endl;
-            m->stmts.scope.print();
-            cout << endl;
         }
     } while(currentScope.tokens != stmts.scope.tokens || currentClassScope.tokens != scope.tokens);
 }

@@ -32,7 +32,6 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope, const Scope &cl
 
             // Make sure we are in a class (not global scope)
             if (scope.tokens.find("this") == scope.tokens.end()) {
-                cout << lexpr->print() << endl;
                 cerr << "Error: " << lexpr->line << ": Attempt to access "
                     << " member value from global scope." << endl;
                 return unknown;
@@ -53,8 +52,6 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope, const Scope &cl
                 cerr << "Error: " << lexpr->line << ": Class " << thisType
                     << " does not have a member value named " << lexpr->ident
                     << endl;
-                cout << "Class scope:" << endl;
-                classScope.print();
                 return unknown;
             }
 
@@ -209,9 +206,6 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
 
                 updateScope(whileStatement->block, AST, whileStatement->block.scope, whileClassScope, inConstructor);
             } while (whileStatement->block.scope.tokens != scopeCopy.tokens || whileClassScope.tokens != classScopeCopy.tokens);
-            cout << "Processed while loop on line " << whileStatement->ifTrue->line << ":" << endl;
-            whileStatement->block.scope.print();
-            cout << endl;
         } else if (Conditional *conditional = dynamic_cast<Conditional *>(stmnt)) {
             // This is very similar to a while loop. First we go through and
             // add scopes to all the blocks in the conditional. Then we set
@@ -219,7 +213,6 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
             // a variable appears in all the scopes of the conditionals,
             // its least common ancestor is added to the main scope.
 
-            auto ifTrue = conditional->conditionals.begin();
             for (auto stmnts = conditional->blocks.begin(); stmnts != conditional->blocks.end(); ++stmnts) {
                     stmnts->scope = scope;
                     Scope stmntsClassScope = classScope;
@@ -232,18 +225,11 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
 
                         updateScope(*stmnts, AST, stmnts->scope, stmntsClassScope, inConstructor);
                     } while (stmnts->scope.tokens != scopeCopy.tokens || stmntsClassScope.tokens != classScopeCopy.tokens);
-                    cout << "Processed conditional on line " << (*ifTrue)->line << ":" << endl;
-                    stmnts->scope.print();
-                    cout << endl;
-                    ++ifTrue;
             };
 
             Scope newScope = conditional->blocks.begin()->scope;
-            cout << "New Scope:" << endl;
-            newScope.print();
             for (auto b = conditional->blocks.begin(); b != conditional->blocks.end(); ++b) {
                 newScope = intersectScopes(newScope, b->scope, AST);
-                newScope.print();
             }
 
             scope = newScope;
@@ -259,10 +245,8 @@ void computeAllScopes(ClassTreeNode *AST) {
         ClassTreeNode *current = toProcess.front();
         toProcess.pop();
 
-        cout << "Processing " << current->className << endl;
         // Compute scopes
         current->populateScopes(AST);
-        cout << endl;
         // Add subclasses
         for_each(current->subclasses.begin(), current->subclasses.end(),
             [&] (ClassTreeNode *subclass) {
@@ -284,7 +268,25 @@ Scope intersectScopes(const Scope &s1, const Scope &s2, ClassTreeNode *AST) {
     return ret;
 }
 
+bool checkAllMethods(ClassTreeNode *AST) {
+    queue<ClassTreeNode *>toProcess;
+    toProcess.push(AST);
 
+    while(!toProcess.empty()) {
+        ClassTreeNode *current = toProcess.front();
+        toProcess.pop();
+
+        bool pass = current->methods.determineIfUnique();
+        if (!pass) { return false; }
+
+        for_each(current->subclasses.begin(), current->subclasses.end(),
+            [&] (ClassTreeNode *subclass) {
+                toProcess.push(subclass);
+        });
+    }
+
+    return true;
+}
 
 
 

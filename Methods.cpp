@@ -5,6 +5,7 @@
 #include <iostream>
 #include <algorithm>
 #include <map>
+#include <list>
 
 using namespace std;
 
@@ -12,6 +13,19 @@ ostream &operator<<(ostream &os, const Method &mthd) {
     os << "Name: " << mthd.name << " Args: " << mthd.fArgs << " Return Type: "
         << mthd.retType << " Line: " << mthd.line << endl;
     return os << mthd.stmts.print(0);
+}
+
+bool Methods::determineIfUnique() {
+    list<string> seen;
+    for (auto m = methods.begin(); m != methods.end(); ++m) {
+        if (find(seen.begin(), seen.end(), m->name) != seen.end()) {
+            cerr << "Error: " << m->line << ": Redefinition of method "
+                << m->name << endl;
+            return false;
+        }
+        seen.push_back(m->name);
+    }
+    return true;
 }
 
 ostream &operator<<(ostream &os, const Methods &mthds) {
@@ -25,7 +39,6 @@ ostream &operator<<(ostream &os, const Methods &mthds) {
 ostream &operator<<(ostream &os, const FormalArg &formalArg) {
     return os << formalArg.var << ": " << formalArg.type;
 }
-
 
 string FormalArgs::toString() const {
     string ret = "";
