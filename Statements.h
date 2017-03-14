@@ -73,32 +73,12 @@ public:
     Statements ss;
 };
 
-class ElifStatement : public Statement {
+class Conditional : public Statement {
 public:
-    ElifStatement(int l, RExpr it, Statements s): Statement(l), ifTrue(it),
-        ss(s) {}
-    std::string print() override;
-    RExpr ifTrue;
-    Statements ss;
-};
-
-class Elifs : public Statement {
-public:
-    Elifs(): Statement(0) {}
-    std::string print() override;
-    std::list<ElifStatement> elifs;
-};
-
-
-class IfStatement : public Statement {
-public:
-    IfStatement(int l, RExpr it, Statements ss, Elifs els, ElseStatement e):
-        Statement(l), ifTrue(it), stmts(ss), elifs(els), el(e) {}
-    std::string print() override;
-    RExpr ifTrue;
-    Statements stmts;
-    Elifs elifs;
-    ElseStatement el;
+    Conditional(int l): Statement(l) {}
+    void add(const Conditional &other);
+    std::list<RExpr *> conditionals;
+    std::list<Statements> blocks;
 };
 
 #endif

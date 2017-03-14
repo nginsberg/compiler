@@ -219,34 +219,44 @@ statement:
     IF r_expr statement_block
     elifs
     else {
-        RExpr *ifTrue = dynamic_cast<RExpr *>$2;
-        Statements *stmts = dynamic_cast<Statements *>$3;
-        Elifs *elifs = dynamic_cast<Elifs *>$4;
-        ElseStatement *el = dynamic_cast<ElseStatement *>$5;
-        $$ = new IfStatement(yylineno, *ifTrue, *stmts, *elifs, *el);
+        Conditional *stmnt = new Conditional(yylineno);
+        stmnt->conditionals.push_back($2);
+        stmnt->blocks.push_back(*$3);
+        Conditional *elifs = dynamic_cast<Conditional *>$4;
+        Conditional *el = dynamic_cast<Conditional *>$5;
+        stmnt->add(*elifs);
+        stmnt->add(*el);
+        $$ = stmnt;
     }
 elifs:
     /* empty */ {
-        $$ = new Elifs();
+        $$ = new Conditional(0);
     }
     | elifs elif {
-        Elifs *es = dynamic_cast<Elifs *>$1;
-        ElifStatement *e = dynamic_cast<ElifStatement *>$2;
-        es->elifs.push_back(*e);
+        Conditional *es = dynamic_cast<Conditional *>$1;
+        Conditional *e = dynamic_cast<Conditional *>$2;
+        es->add(*e);
         $$ = es;
     }
     ;
 elif:
     ELIF r_expr statement_block {
-        $$ = new ElifStatement(yylineno, *$2, *$3);
+        Conditional *stmnt = new Conditional(yylineno);
+        stmnt->conditionals.push_back($2);
+        stmnt->blocks.push_back(*$3);
+        $$ = stmnt;
     }
     ;
 else:
     /* empty */ {
-        $$ = new ElseStatement(0, Statements());
+        $$ = new Conditional(0);
     }
     | ELSE statement_block {
-        $$ = new ElseStatement(yylineno, *$2);
+        RExpr *conditional = new BoolLit(yylineno, true);
+        Conditional *stmnt = new Conditional(yylineno);
+        stmnt->conditionals.push_back(conditional);
+        stmnt->blocks.push_back(*$2);
+        $$ = stmnt;
     }
     ;
 
