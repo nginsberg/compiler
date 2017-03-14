@@ -45,30 +45,20 @@ string WhileStatement::print() {
     return ret;
 }
 
-string ElseStatement::print() {
-    string ret = to_string(line) + ": ELSE ->\n";
-    ret += ss.print();
-    return ret;
+void Conditional::add(const Conditional &other) {
+    auto cond = other.conditionals.begin();
+    auto block = other.blocks.begin();
+
+    while (cond != other.conditionals.end()) {
+        conditionals.push_back(*cond);
+        blocks.push_back(*block);
+        ++cond;
+        ++block;
+    }
 }
 
-string ElifStatement::print() {
-    string ret = to_string(line) + ": ELIF (" + ifTrue->print() + ") ->\n";
-    ret += ss.print();
-    return ret;
-}
-
-string Elifs::print() {
-    string ret;
-    for_each(elifs.begin(), elifs.end(), [&] (ElifStatement s) {
-        ret += s.print() + "\n";
-    });
-    return ret;
-}
-
-string IfStatement::print() {
-    string ret = to_string(line) + ": IF (" + ifTrue->print() + ") ->\n";
-    ret += stmts.print();
-    ret += elifs.print();
-    ret += el.print();
-    return ret;
+void Scope::addReturn() {
+    if (tokens.find("$return") == tokens.end()) {
+        tokens["$return"] = "Nothing";
+    }
 }

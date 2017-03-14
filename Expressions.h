@@ -30,6 +30,13 @@ public:
     int val;
 };
 
+class BoolLit : public RExpr {
+public:
+    BoolLit(int l, bool v): RExpr("", l), val(v) {}
+    std::string print() override { return std::to_string(val); }
+    bool val;
+};
+
 class LExpr : public RExpr {
 public:
     LExpr(int l, RExpr *e, std::string i): RExpr("", l), expr(e), ident(i) {}

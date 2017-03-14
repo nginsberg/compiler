@@ -39,6 +39,7 @@
 %union {
     int ival;
     const char *sval;
+    BoolLit *bval;
 
     ClassSignature *cs;
     Class *cl;
@@ -83,11 +84,14 @@
 %token IDENT
 %token INT_LIT
 %token STRING_LIT
+%token TRUE
+%token FALSE
 
 
 %type <sval>  ident
 %type <sval>  string_lit
 %type <ival>  int_lit
+%type <bval>  bool_lit
 %type <sval>  return
 
 %type <cs>    class_signature
@@ -215,34 +219,44 @@ statement:
     IF r_expr statement_block
     elifs
     else {
-        RExpr *ifTrue = dynamic_cast<RExpr *>$2;
-        Statements *stmts = dynamic_cast<Statements *>$3;
-        Elifs *elifs = dynamic_cast<Elifs *>$4;
-        ElseStatement *el = dynamic_cast<ElseStatement *>$5;
-        $$ = new IfStatement(yylineno, ifTrue, *stmts, *elifs, *el);
+        Conditional *stmnt = new Conditional(yylineno);
+        stmnt->conditionals.push_back($2);
+        stmnt->blocks.push_back(*$3);
+        Conditional *elifs = dynamic_cast<Conditional *>$4;
+        Conditional *el = dynamic_cast<Conditional *>$5;
+        stmnt->add(*elifs);
+        stmnt->add(*el);
+        $$ = stmnt;
     }
 elifs:
     /* empty */ {
-        $$ = new Elifs();
+        $$ = new Conditional(0);
     }
     | elifs elif {
-        Elifs *es = dynamic_cast<Elifs *>$1;
-        ElifStatement *e = dynamic_cast<ElifStatement *>$2;
-        es->elifs.push_back(*e);
+        Conditional *es = dynamic_cast<Conditional *>$1;
+        Conditional *e = dynamic_cast<Conditional *>$2;
+        es->add(*e);
         $$ = es;
     }
     ;
 elif:
     ELIF r_expr statement_block {
-        $$ = new ElifStatement(yylineno, $2, *$3);
+        Conditional *stmnt = new Conditional(yylineno);
+        stmnt->conditionals.push_back($2);
+        stmnt->blocks.push_back(*$3);
+        $$ = stmnt;
     }
     ;
 else:
     /* empty */ {
-        $$ = new ElseStatement(0, Statements());
+        $$ = new Conditional(0);
     }
     | ELSE statement_block {
-        $$ = new ElseStatement(yylineno, *$2);
+        RExpr *conditional = new BoolLit(yylineno, true);
+        Conditional *stmnt = new Conditional(yylineno);
+        stmnt->conditionals.push_back(conditional);
+        stmnt->blocks.push_back(*$2);
+        $$ = stmnt;
     }
     ;
 
@@ -296,6 +310,9 @@ r_expr:
     }
     | int_lit {
         $$ = new IntLit(yylineno, $1);
+    }
+    | bool_lit {
+        $$ = $1;
     }
     | l_expr {
         $$ = $1;
@@ -394,6 +411,8 @@ actual_args:
 ident: IDENT { $$ = strdup(yytext); }
 int_lit: INT_LIT { $$ = atoi(yytext); }
 string_lit: STRING_LIT { $$ = strdup(yytext); }
+bool_lit: TRUE { $$ = new BoolLit(yylineno, true); }
+    | FALSE { $$ = new BoolLit(yylineno, false); }
 %%
 
 int main(int argc, char** argv) {
@@ -424,24 +443,14 @@ int main(int argc, char** argv) {
 
     computeAllScopes(&classHierarchy);
 
-    Scope mainScope;
-    for_each(stmts->ss.begin(), stmts->ss.end(), [&] (Statement *stmnt) {
-        if (AssignStatement *assignment = dynamic_cast<AssignStatement *>(stmnt)) {
-            string t = type(assignment->from, &classHierarchy, mainScope);
-
-            // Figure out new type
-            // First, test if we've seen it before. If we haven't we just add it
-            auto var = mainScope.tokens.find(assignment->to->print());
-            if (var == mainScope.tokens.end()) { // We found a new variable
-                mainScope.tokens[assignment->to->print()] = t;
-            } else { // We are reassigning
-                ClassTreeNode *c1 = classHierarchy.classFromName(var->second);
-                ClassTreeNode *c2 = classHierarchy.classFromName(t);
-                mainScope.tokens[assignment->to->print()] = leastCommonAncestor(c1, c2);
-            }
-            // cout << assignment->to->print() << ": " << mainScope.tokens[assignment->to->print()] << endl;
-        }
-        });
+    Scope mainScope, scopeCopy, emptyScope;
+    do {
+        scopeCopy = mainScope;
+        updateScope(*stmts, &classHierarchy, mainScope, emptyScope, false);
+    } while (scopeCopy.tokens != mainScope.tokens);
+    cout << "After processing main scope:" << endl;
+    mainScope.print();
+    cout << endl;
 
     return 0;
 }

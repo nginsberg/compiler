@@ -16,6 +16,8 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope, const Scope &cl
         return "String";
     } else if (IntLit *intLit = dynamic_cast<IntLit *>(expr)) {
         return "Int";
+    } else if (BoolLit *boolLit = dynamic_cast<BoolLit *>(expr)) {
+        return "Boolean";
     } else if (ConstructorCall *call = dynamic_cast<ConstructorCall *>(expr)) {
         if (AST->classFromName(call->className)) { return call->className; }
         cerr << "Error: " << call->line << ": Call to constructor for class "
@@ -93,7 +95,7 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope, const Scope &cl
             ++arg) {
             argTypes.push_back(type(*arg, AST, scope, classScope));
         }
-        string ret = cl->returnTypeForFunction(name, argTypes);
+        string ret = cl->returnTypeForFunction(name, argTypes, AST);
         if (ret == "") {
             cerr << "Error: " << call->line << ": Unable to find function "
                 << "matching " << call->print() << endl;
@@ -146,6 +148,11 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
             } else {
                 ClassTreeNode *c1 = AST->classFromName(var->second);
                 ClassTreeNode *c2 = AST->classFromName(t);
+                if (!c2) {
+                    cerr << "Error: " << assignment->line << ": unrecognized "
+                        << "type " << t << endl;
+                    return;
+                }
                 usedScope->tokens[assignment->to->ident] = leastCommonAncestor(c1, c2);
             }
         } else if (ReturnStatement *retSatement = dynamic_cast<ReturnStatement *>(stmnt)) {
@@ -190,87 +197,56 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
             }
 
             // Now we make copies of the scope and update the copies until they
-            // are stable. Then we throw the copies away, since the while loop
-            // may never execute, but we want to make sure there are no errors
-            Scope scopeCopy;
-            Scope classScopeCopy;
-            do {
-                scopeCopy = scope;
-                classScopeCopy = classScope;
-
-                updateScope(whileStatement->block, AST, scopeCopy, classScopeCopy, inConstructor);
-            } while (scope.tokens != scopeCopy.tokens || classScope.tokens != classScopeCopy.tokens);
-        } else if (IfStatement *ifStatement = dynamic_cast<IfStatement *>(stmnt)) {
-            // First we check all the conditionals and make sure they inherit
-            // from Boolean
-
-            string t = type(ifStatement->ifTrue, AST, scope, classScope);
-            if (t == unknown) {
-                cerr << "Error: " << ifStatement->line << ":  Cannot determine "
-                    << "type of rexpr " << ifStatement->ifTrue->print() << endl;
-                return;
-            }
-            ClassTreeNode *cl = AST->classFromName(t);
-            if (!cl->inheritsFrom("Boolean")) {
-                cerr << "Error: " << whileStatement->line << ": Conditional "
-                    << "must have a type that inherits from Boolean, which "
-                    << t << " does not" << endl;
-                return;
-            }
-
-            for_each(ifStatement->elifs.elifs.begin(), ifStatement->elifs.elifs.end(),
-                [&] (ElifStatement s) {
-                    string t = type(s.ifTrue, AST, scope, classScope);
-                    if (t == unknown) {
-                        cerr << "Error: " << s.line << ":  Cannot determine "
-                            << "type of rexpr " << s.ifTrue->print() << endl;
-                        return;
-                    }
-                    ClassTreeNode *cl = AST->classFromName(t);
-                    if (!cl->inheritsFrom("Boolean")) {
-                        cerr << "Error: " << whileStatement->line << ": Conditional "
-                            << "must have a type that inherits from Boolean, which "
-                            << t << " does not" << endl;
-                        return;
-                    }
-            });
-
-            // We are going to calculate what the scopes would be on each
-            // branch of the if statement, and then intersect them.
-            list<Scope> scopes;
-            list<Scope> classScopes;
+            // are stable.
+            whileStatement->block.scope = scope;
+            Scope whileClassScope = classScope;
 
             Scope scopeCopy;
             Scope classScopeCopy;
             do {
-                scopeCopy = scope;
-                classScopeCopy = classScope;
+                scopeCopy = whileStatement->block.scope;
+                classScopeCopy = whileClassScope;
 
-                updateScope(ifStatement->stmts, AST, scopeCopy, classScopeCopy, inConstructor);
-            } while (scope.tokens != scopeCopy.tokens || classScope.tokens != classScopeCopy.tokens);
-            scopes.push_back(scopeCopy);
-            classScopes.push_back(classScopeCopy);
+                updateScope(whileStatement->block, AST, whileStatement->block.scope, whileClassScope, inConstructor);
+            } while (whileStatement->block.scope.tokens != scopeCopy.tokens || whileClassScope.tokens != classScopeCopy.tokens);
+            cout << "Processed while loop on line " << whileStatement->ifTrue->line << ":" << endl;
+            whileStatement->block.scope.print();
+            cout << endl;
+        } else if (Conditional *conditional = dynamic_cast<Conditional *>(stmnt)) {
+            // This is very similar to a while loop. First we go through and
+            // add scopes to all the blocks in the conditional. Then we set
+            // our scope to the intersection of those scopes; basically, if
+            // a variable appears in all the scopes of the conditionals,
+            // its least common ancestor is added to the main scope.
 
-            for_each(ifStatement->elifs.elifs.begin(), ifStatement->elifs.elifs.end(),
-                [&] (ElifStatement s) {
+            auto ifTrue = conditional->conditionals.begin();
+            for (auto stmnts = conditional->blocks.begin(); stmnts != conditional->blocks.end(); ++stmnts) {
+                    stmnts->scope = scope;
+                    Scope stmntsClassScope = classScope;
+
+                    Scope scopeCopy;
+                    Scope classScopeCopy;
                     do {
-                        scopeCopy = scope;
-                        classScopeCopy = classScope;
+                        scopeCopy = stmnts->scope;
+                        classScopeCopy = stmntsClassScope;
 
-                        updateScope(s.ss, AST, scopeCopy, classScopeCopy, inConstructor);
-                    } while (scope.tokens != scopeCopy.tokens || classScope.tokens != classScopeCopy.tokens);
-                    scopes.push_back(scopeCopy);
-                    classScopes.push_back(classScopeCopy);
-            });
+                        updateScope(*stmnts, AST, stmnts->scope, stmntsClassScope, inConstructor);
+                    } while (stmnts->scope.tokens != scopeCopy.tokens || stmntsClassScope.tokens != classScopeCopy.tokens);
+                    cout << "Processed conditional on line " << (*ifTrue)->line << ":" << endl;
+                    stmnts->scope.print();
+                    cout << endl;
+                    ++ifTrue;
+            };
 
-            do {
-                scopeCopy = scope;
-                classScopeCopy = classScope;
+            Scope newScope = conditional->blocks.begin()->scope;
+            cout << "New Scope:" << endl;
+            newScope.print();
+            for (auto b = conditional->blocks.begin(); b != conditional->blocks.end(); ++b) {
+                newScope = intersectScopes(newScope, b->scope, AST);
+                newScope.print();
+            }
 
-                updateScope(ifStatement->el.ss, AST, scopeCopy, classScopeCopy, inConstructor);
-            } while (scope.tokens != scopeCopy.tokens || classScope.tokens != classScopeCopy.tokens);
-            scopes.push_back(scopeCopy);
-            classScopes.push_back(classScopeCopy);
+            scope = newScope;
         }
     });
 }
@@ -283,8 +259,10 @@ void computeAllScopes(ClassTreeNode *AST) {
         ClassTreeNode *current = toProcess.front();
         toProcess.pop();
 
+        cout << "Processing " << current->className << endl;
         // Compute scopes
         current->populateScopes(AST);
+        cout << endl;
         // Add subclasses
         for_each(current->subclasses.begin(), current->subclasses.end(),
             [&] (ClassTreeNode *subclass) {
@@ -292,4 +270,44 @@ void computeAllScopes(ClassTreeNode *AST) {
         });
     }
 }
+
+Scope intersectScopes(const Scope &s1, const Scope &s2, ClassTreeNode *AST) {
+    Scope ret;
+    for (auto t1 = s1.tokens.begin(); t1 != s1.tokens.end(); ++t1) {
+        auto t2 = s2.tokens.find(t1->first);
+        if (t2 != s2.tokens.end()) {
+            ClassTreeNode *c1 = AST->classFromName(t1->second);
+            ClassTreeNode *c2 = AST->classFromName(t2->second);
+            ret.tokens[t1->first] = leastCommonAncestor(c1, c2);
+        }
+    }
+    return ret;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

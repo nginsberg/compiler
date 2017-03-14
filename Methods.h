@@ -29,13 +29,6 @@ public:
 
 std::ostream &operator<<(std::ostream &os, const FormalArgs &formalArgs);
 
-class Scope {
-public:
-    std::map<std::string, std::string> tokens;
-    void addFormalArgs(const FormalArgs &fArgs);
-    void print() const;
-};
-
 class Method {
 public:
     Method(std::string n, FormalArgs args, std::string r, Statements ss, int l):
@@ -45,8 +38,6 @@ public:
     FormalArgs fArgs;
     Statements stmts;
     int line;
-
-    Scope scope;
 };
 
 std::ostream &operator<<(std::ostream &os, const Method &mthd);

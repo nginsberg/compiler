@@ -67,7 +67,7 @@ public:
     // Returns the return type for the corresponding function, or the empty
     // string if none is found.
     std::string returnTypeForFunction(std::string name,
-        std::list<std::string> argTypes);
+        std::list<std::string> argTypes, ClassTreeNode *AST);
 
     // Calculate the scope for the class and its methods.
     void populateScopes(ClassTreeNode *AST);
@@ -82,7 +82,7 @@ public:
     Methods methods;
     FormalArgs fArgs;
     Statements stmts;
-    Scope scope, constructorScope;
+    Scope scope;
 };
 
 std::string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,
@@ -98,5 +98,7 @@ void computeAllScopes(ClassTreeNode *AST);
 std::ostream &operator<<(std::ostream &os, const ClassTreeNode &ctn);
 
 void makeSureTableIsEmpty(const Classes &cls);
+
+Scope intersectScopes(const Scope &s1, const Scope &s2, ClassTreeNode *AST);
 
 #endif

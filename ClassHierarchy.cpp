@@ -275,7 +275,7 @@ list<ClassTreeNode *>ClassTreeNode::superChain() {
     return ret;
 }
 
-string ClassTreeNode::returnTypeForFunction(string name, list<string> argTypes) {
+string ClassTreeNode::returnTypeForFunction(string name, list<string> argTypes, ClassTreeNode *AST) {
     list<ClassTreeNode *>toSearch = superChain();
     toSearch.push_front(this);
 
@@ -291,7 +291,8 @@ string ClassTreeNode::returnTypeForFunction(string name, list<string> argTypes) 
             auto sup = argTypes.begin(); // Supplied type
             bool matchedUp = true;
             while (sup != argTypes.end()) {
-                if (req->type != *sup) {
+                ClassTreeNode *reqClass = AST->classFromName(req->type);
+                if (!reqClass->inheritsFrom(*sup)) {
                     matchedUp = false;
                     break;
                 }
@@ -309,30 +310,46 @@ string ClassTreeNode::returnTypeForFunction(string name, list<string> argTypes) 
 void ClassTreeNode::populateScopes(ClassTreeNode *AST) {
     Scope currentScope;
     Scope currentClassScope;
-    constructorScope.addFormalArgs(fArgs);
-    constructorScope.tokens["this"] = className;
+    stmts.scope.addFormalArgs(fArgs);
+    stmts.scope.tokens["this"] = className;
     do {
         do {
             currentClassScope = scope;
-            currentScope = constructorScope;
+            currentScope = stmts.scope;
 
             // First we process the constructor
-            updateScope(stmts, AST, constructorScope, scope, true);
-        } while(currentScope.tokens != constructorScope.tokens || currentClassScope.tokens != scope.tokens);
+            updateScope(stmts, AST, stmts.scope, scope, true);
+        } while(currentScope.tokens != stmts.scope.tokens || currentClassScope.tokens != scope.tokens);
+        stmts.scope.addReturn();
+        cout << "After Processing Constructor:" << endl;
+        cout << "Class Scope:" << endl;
+        scope.print();
+        cout << endl;
+        cout << "Constructor Scope:" << endl;
+        stmts.scope.print();
+        cout << endl;
 
         // Now we process each method
         for (auto m = methods.methods.begin(); m != methods.methods.end(); ++m) {
             Scope methodScope;
             Scope classScopeCopy;
-            m->scope.addFormalArgs(m->fArgs);
-            m->scope.tokens["this"] = className;
+            m->stmts.scope.addFormalArgs(m->fArgs);
+            m->stmts.scope.tokens["this"] = className;
             do {
-                methodScope = m->scope;
+                methodScope = m->stmts.scope;
                 classScopeCopy = scope;
-                updateScope(m->stmts, AST, m->scope, scope, false);
-            } while(methodScope.tokens != m->scope.tokens || classScopeCopy.tokens != scope.tokens);
+                updateScope(m->stmts, AST, m->stmts.scope, scope, false);
+            } while(methodScope.tokens != m->stmts.scope.tokens || classScopeCopy.tokens != scope.tokens);
+            m->stmts.scope.addReturn();
+            cout << "After Processing Method " << m->name << ":" << endl;
+            cout << "Class Scope:" << endl;
+            scope.print();
+            cout << endl;
+            cout << "Method Scope:" << endl;
+            m->stmts.scope.print();
+            cout << endl;
         }
-    } while(currentScope.tokens != constructorScope.tokens || currentClassScope.tokens != scope.tokens);
+    } while(currentScope.tokens != stmts.scope.tokens || currentClassScope.tokens != scope.tokens);
 }
 
 bool ClassTreeNode::inheritsFrom(string possibleSuper) {
