@@ -148,6 +148,11 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
             } else {
                 ClassTreeNode *c1 = AST->classFromName(var->second);
                 ClassTreeNode *c2 = AST->classFromName(t);
+                if (!c2) {
+                    cerr << "Error: " << assignment->line << ": unrecognized "
+                        << "type " << t << endl;
+                    return;
+                }
                 usedScope->tokens[assignment->to->ident] = leastCommonAncestor(c1, c2);
             }
         } else if (ReturnStatement *retSatement = dynamic_cast<ReturnStatement *>(stmnt)) {

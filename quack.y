@@ -443,24 +443,14 @@ int main(int argc, char** argv) {
 
     computeAllScopes(&classHierarchy);
 
-    Scope mainScope;
-    for_each(stmts->ss.begin(), stmts->ss.end(), [&] (Statement *stmnt) {
-        if (AssignStatement *assignment = dynamic_cast<AssignStatement *>(stmnt)) {
-            string t = type(assignment->from, &classHierarchy, mainScope);
-
-            // Figure out new type
-            // First, test if we've seen it before. If we haven't we just add it
-            auto var = mainScope.tokens.find(assignment->to->print());
-            if (var == mainScope.tokens.end()) { // We found a new variable
-                mainScope.tokens[assignment->to->print()] = t;
-            } else { // We are reassigning
-                ClassTreeNode *c1 = classHierarchy.classFromName(var->second);
-                ClassTreeNode *c2 = classHierarchy.classFromName(t);
-                mainScope.tokens[assignment->to->print()] = leastCommonAncestor(c1, c2);
-            }
-            // cout << assignment->to->print() << ": " << mainScope.tokens[assignment->to->print()] << endl;
-        }
-        });
+    Scope mainScope, scopeCopy, emptyScope;
+    do {
+        scopeCopy = mainScope;
+        updateScope(*stmts, &classHierarchy, mainScope, emptyScope, false);
+    } while (scopeCopy.tokens != mainScope.tokens);
+    cout << "After processing main scope:" << endl;
+    mainScope.print();
+    cout << endl;
 
     return 0;
 }
