@@ -16,6 +16,8 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope, const Scope &cl
         return "String";
     } else if (IntLit *intLit = dynamic_cast<IntLit *>(expr)) {
         return "Int";
+    } else if (BoolLit *boolLit = dynamic_cast<BoolLit *>(expr)) {
+        return "Boolean";
     } else if (ConstructorCall *call = dynamic_cast<ConstructorCall *>(expr)) {
         if (AST->classFromName(call->className)) { return call->className; }
         cerr << "Error: " << call->line << ": Call to constructor for class "

@@ -50,6 +50,8 @@ return                  { return RETURN; }
 and                     { return AND; }
 or                      { return OR; }
 not                     { return NOT; }
+true                    { return TRUE; }
+false                   { return FALSE; }
 [0-9]*                  { return INT_LIT; }
 [a-zA-Z_][a-zA-Z0-9_]*  { return IDENT; }
 [/][/].*                { ; }

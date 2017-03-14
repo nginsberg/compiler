@@ -5,7 +5,7 @@
 class Pt(x: Int, y: Int) {
   this.x = x;
   this.y = y;
-  this.b = Boolean();
+  this.b = false;
 
   def STR() : String {
       return this.x + this.y;

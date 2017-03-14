@@ -39,6 +39,7 @@
 %union {
     int ival;
     const char *sval;
+    BoolLit *bval;
 
     ClassSignature *cs;
     Class *cl;
@@ -83,11 +84,14 @@
 %token IDENT
 %token INT_LIT
 %token STRING_LIT
+%token TRUE
+%token FALSE
 
 
 %type <sval>  ident
 %type <sval>  string_lit
 %type <ival>  int_lit
+%type <bval>  bool_lit
 %type <sval>  return
 
 %type <cs>    class_signature
@@ -297,6 +301,9 @@ r_expr:
     | int_lit {
         $$ = new IntLit(yylineno, $1);
     }
+    | bool_lit {
+        $$ = $1;
+    }
     | l_expr {
         $$ = $1;
     }
@@ -394,6 +401,8 @@ actual_args:
 ident: IDENT { $$ = strdup(yytext); }
 int_lit: INT_LIT { $$ = atoi(yytext); }
 string_lit: STRING_LIT { $$ = strdup(yytext); }
+bool_lit: TRUE { $$ = new BoolLit(yylineno, true); }
+    | FALSE { $$ = new BoolLit(yylineno, false); }
 %%
 
 int main(int argc, char** argv) {
