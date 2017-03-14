@@ -99,4 +99,6 @@ std::ostream &operator<<(std::ostream &os, const ClassTreeNode &ctn);
 
 void makeSureTableIsEmpty(const Classes &cls);
 
+Scope intersectScopes(const Scope &s1, const Scope &s2, ClassTreeNode *AST);
+
 #endif

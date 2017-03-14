@@ -19,13 +19,19 @@ class Pt(x: Int, y: Int) {
       while (not this.b) {
           if (this.x < this.y) {
               this.x = this.x + 1;
+              g = 3;
           } elif (this.x + 1 == this.y) {
+              g = "boo";
+              d = 4;
               this.x = this.x + 4;
           } elif (this.x == this.y) {
+              g = 7;
               this.x = this.y;
           } else {
+            g = true;
             this.x = this.x - 1;
           }
+          bar = g;
       }
   }
 
