@@ -190,16 +190,24 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
             }
 
             // Now we make copies of the scope and update the copies until they
-            // are stable. Then we throw the copies away, since the while loop
-            // may never execute, but we want to make sure there are no errors
+            // are stable.
+            whileStatement->block.scope = scope;
+            Scope whileClassScope = classScope;
+
             Scope scopeCopy;
             Scope classScopeCopy;
             do {
-                scopeCopy = scope;
-                classScopeCopy = classScope;
+                scopeCopy = whileStatement->block.scope;
+                classScopeCopy = whileClassScope;
 
-                updateScope(whileStatement->block, AST, scopeCopy, classScopeCopy, inConstructor);
-            } while (scope.tokens != scopeCopy.tokens || classScope.tokens != classScopeCopy.tokens);
+                updateScope(whileStatement->block, AST, whileStatement->block.scope, whileClassScope, inConstructor);
+            } while (whileStatement->block.scope.tokens != scopeCopy.tokens || whileClassScope.tokens != classScopeCopy.tokens);
+            cout << "Processed while loop on line " << whileStatement->ifTrue->line << ":" << endl;
+            whileStatement->block.scope.print();
+            whileStatement->block.scope.print();
+            cout << endl;
+            scope.print();
+            cout << endl;
         }
     });
 }
