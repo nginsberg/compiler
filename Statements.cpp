@@ -72,3 +72,9 @@ string IfStatement::print() {
     ret += el.print();
     return ret;
 }
+
+void Scope::addReturn() {
+    if (tokens.find("$return") == tokens.end()) {
+        tokens["$return"] = "Nothing";
+    }
+}

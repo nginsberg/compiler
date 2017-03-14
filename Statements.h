@@ -15,6 +15,7 @@ class Scope {
 public:
     std::map<std::string, std::string> tokens;
     void addFormalArgs(const FormalArgs &fArgs);
+    void addReturn();
     void print() const;
 };
 
