@@ -4,9 +4,19 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <map>
 
 #include "gc.h"
 #include "Expressions.h"
+
+class FormalArgs;
+
+class Scope {
+public:
+    std::map<std::string, std::string> tokens;
+    void addFormalArgs(const FormalArgs &fArgs);
+    void print() const;
+};
 
 class Statement {
 public:
@@ -20,6 +30,8 @@ public:
     std::list<Statement *> ss;
     std::string print(int tabs = 1) const;
     std::string node(std::string lblName) const;
+
+    Scope scope;
 };
 
 class BareStatement : public Statement {

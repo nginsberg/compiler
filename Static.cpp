@@ -93,7 +93,7 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope, const Scope &cl
             ++arg) {
             argTypes.push_back(type(*arg, AST, scope, classScope));
         }
-        string ret = cl->returnTypeForFunction(name, argTypes);
+        string ret = cl->returnTypeForFunction(name, argTypes, AST);
         if (ret == "") {
             cerr << "Error: " << call->line << ": Unable to find function "
                 << "matching " << call->print() << endl;
@@ -212,8 +212,10 @@ void computeAllScopes(ClassTreeNode *AST) {
         ClassTreeNode *current = toProcess.front();
         toProcess.pop();
 
+        cout << "Processing " << current->className << endl;
         // Compute scopes
         current->populateScopes(AST);
+        cout << endl;
         // Add subclasses
         for_each(current->subclasses.begin(), current->subclasses.end(),
             [&] (ClassTreeNode *subclass) {
