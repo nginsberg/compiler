@@ -36,6 +36,51 @@ ostream &operator<<(ostream &os, const Methods &mthds) {
     return os;
 }
 
+bool Method::determineIfOverrideOk(ClassTreeNode *owner, ClassTreeNode *AST) {
+    list<ClassTreeNode *> toSearch = owner->superChain();
+    for (auto c = toSearch.begin(); c != toSearch.end(); ++c) {
+        for (auto m = (*c)->methods.methods.begin(); m != (*c)->methods.methods.end(); ++m) {
+            if (m->name == name) { // We found the method we are overriding
+                // Check return type is a subclass
+                ClassTreeNode *retTypeClass = AST->classFromName(retType);
+                if (!retTypeClass) {
+                    cerr << "Error: " << line << ": return type " << retType
+                        << " is not a defined class." << endl;
+                    return false;
+                }
+                if (!retTypeClass->inheritsFrom(m->retType)) {
+                    cerr << "Error: " << line << ": return type " << retType
+                        << "is not a subclass of return type of overridden "
+                        << "method." << endl;
+                    return false;
+                }
+
+                // Check the argument types match
+                if (fArgs.fArgs.size() != m->fArgs.fArgs.size()) {
+                    cerr << "Error: " << line << ": different number of "
+                        << "arguments from overridden method" << endl;
+                    return false;
+                }
+                auto arg = fArgs.fArgs.begin();
+                auto sArg = m->fArgs.fArgs.begin();
+                while (arg != fArgs.fArgs.end()) {
+                    ClassTreeNode *sArgClass = AST->classFromName(sArg->type);
+                    if (!sArgClass->inheritsFrom(arg->type)) {
+                        cerr << "Error: " << line << ": " << arg->var
+                            << " has a type that is not a superclass of its "
+                            << "type in the overridden method." << endl;
+                        return false;
+                    }
+
+                    ++arg; ++sArg;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
 ostream &operator<<(ostream &os, const FormalArg &formalArg) {
     return os << formalArg.var << ": " << formalArg.type;
 }

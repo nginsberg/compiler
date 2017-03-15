@@ -291,8 +291,9 @@ string ClassTreeNode::returnTypeForFunction(string name, list<string> argTypes, 
             auto sup = argTypes.begin(); // Supplied type
             bool matchedUp = true;
             while (sup != argTypes.end()) {
-                ClassTreeNode *reqClass = AST->classFromName(req->type);
-                if (!reqClass->inheritsFrom(*sup)) {
+                ClassTreeNode *supClass = AST->classFromName(*sup);
+                if (!supClass) { return ""; }
+                if (!supClass->inheritsFrom(req->type)) {
                     matchedUp = false;
                     break;
                 }
@@ -305,6 +306,23 @@ string ClassTreeNode::returnTypeForFunction(string name, list<string> argTypes, 
     }
 
     return "";
+}
+
+bool ClassTreeNode::validateConstructorArgs(list<string> argTypes, ClassTreeNode *AST) {
+    if (fArgs.fArgs.size() != argTypes.size()) {
+        return false;
+    }
+
+    auto req = fArgs.fArgs.begin();
+    auto sup = argTypes.begin();
+    while(sup != argTypes.end()) {
+        ClassTreeNode *supClass = AST->classFromName(*sup);
+        if (!supClass) { return false; }
+        if (!supClass->inheritsFrom(req->type)) { return false; }
+        ++req;
+        ++sup;
+    }
+    return true;
 }
 
 void ClassTreeNode::populateScopes(ClassTreeNode *AST) {

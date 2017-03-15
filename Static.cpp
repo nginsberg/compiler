@@ -19,11 +19,26 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope, const Scope &cl
     } else if (BoolLit *boolLit = dynamic_cast<BoolLit *>(expr)) {
         return "Boolean";
     } else if (ConstructorCall *call = dynamic_cast<ConstructorCall *>(expr)) {
-        if (AST->classFromName(call->className)) { return call->className; }
-        cerr << "Error: " << call->line << ": Call to constructor for class "
-            << call->className << " when " << call->className << " was never "
-            << "definded." << endl;
-        return unknown;
+        ClassTreeNode *constructed = AST->classFromName(call->className);
+        if (!constructed) {
+            cerr << "Error: " << call->line << ": Call to constructor for class "
+                << call->className << " when " << call->className << " was never "
+                << "defined." << endl;
+            return unknown;
+        }
+
+        list<string> argTypes;
+        for (auto arg = call->args.args.begin(); arg != call->args.args.end();
+            ++arg) {
+            argTypes.push_back(type(*arg, AST, scope, classScope));
+        }
+
+        if (!constructed->validateConstructorArgs(argTypes, AST)) {
+            cerr << "Error: " << call->line << ": Invalid arguments to "
+                << "constructor for class " << call->className << endl;
+            return unknown;
+        }
+        return call->className;
     } else if (LExpr *lexpr = dynamic_cast<LExpr *>(expr)) {
         if (lexpr->expr) {
             // The type of expr needs to be the same as the type of this, or
@@ -131,6 +146,7 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
                     << "type of rexpr " << assignment->from->print() << endl;
                 return;
             }
+
 
             // Add it to the proper scope.
             auto var = usedScope->tokens.find(assignment->to->ident);
@@ -276,8 +292,11 @@ bool checkAllMethods(ClassTreeNode *AST) {
         ClassTreeNode *current = toProcess.front();
         toProcess.pop();
 
-        bool pass = current->methods.determineIfUnique();
-        if (!pass) { return false; }
+        if (!current->methods.determineIfUnique()) { return false; }
+
+        for (auto m = current->methods.methods.begin(); m != current->methods.methods.end(); ++m) {
+            if (!m->determineIfOverrideOk(current, AST)) { return false; }
+        }
 
         for_each(current->subclasses.begin(), current->subclasses.end(),
             [&] (ClassTreeNode *subclass) {

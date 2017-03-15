@@ -69,6 +69,8 @@ public:
     std::string returnTypeForFunction(std::string name,
         std::list<std::string> argTypes, ClassTreeNode *AST);
 
+    bool validateConstructorArgs(std::list<std::string> argTypes, ClassTreeNode *AST);
+
     // Calculate the scope for the class and its methods.
     void populateScopes(ClassTreeNode *AST);
 

@@ -441,8 +441,10 @@ int main(int argc, char** argv) {
     // cout << classHierarchy << endl;
     makeSureTableIsEmpty(*cls); // Everything should be in classHierarchy
 
+    if (!checkAllMethods(&classHierarchy)) { return -1; }
+
     computeAllScopes(&classHierarchy);
-    checkAllMethods(&classHierarchy);
+
 
     Scope mainScope, scopeCopy, emptyScope;
     do {

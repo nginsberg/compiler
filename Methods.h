@@ -29,10 +29,14 @@ public:
 
 std::ostream &operator<<(std::ostream &os, const FormalArgs &formalArgs);
 
+class ClassTreeNode;
+
 class Method {
 public:
     Method(std::string n, FormalArgs args, std::string r, Statements ss, int l):
         name(n), retType(r), fArgs(args), stmts(ss), line(l) {}
+    bool determineIfOverrideOk(ClassTreeNode *owner, ClassTreeNode *AST);
+
     std::string name;
     std::string retType;
     FormalArgs fArgs;
