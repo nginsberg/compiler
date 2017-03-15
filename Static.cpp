@@ -118,8 +118,9 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope, const Scope &cl
     return unknown;
 }
 
-void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
+int updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
     Scope &classScope, bool inConstructor) {
+    int numErrors = 0;
     for_each(stmts.ss.begin(), stmts.ss.end(), [&] (Statement *stmnt) {
         if (AssignStatement *assignment = dynamic_cast<AssignStatement *>(stmnt)) {
             // First we determine if this is an assignment to the local scope
@@ -128,6 +129,7 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
             bool canCreateNewVariable = true;
             if (assignment->to->expr) {
                 if (assignment->to->expr->print() != "this") {
+                    ++numErrors;
                     cerr << "Error: " << assignment->line << ": Attempt to "
                         << "assign to a member variable from a different class"
                         << "." << endl;
@@ -142,6 +144,7 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
             // Determine the new type
             string t = type(assignment->from, AST, scope, classScope);
             if (t == unknown) {
+                ++numErrors;
                 cerr << "Error: " << assignment->line << ": Cannot determine "
                     << "type of rexpr " << assignment->from->print() << endl;
                 return;
@@ -152,6 +155,7 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
             auto var = usedScope->tokens.find(assignment->to->ident);
             if (var == usedScope->tokens.end()) { // New variable
                 if (!canCreateNewVariable) {
+                    ++numErrors;
                     cerr << "Error: " << assignment->line << ": class member "
                         << "variable " << assignment->to->ident << " must be "
                         << "initialized in the constructor." << endl;
@@ -162,6 +166,7 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
                 ClassTreeNode *c1 = AST->classFromName(var->second);
                 ClassTreeNode *c2 = AST->classFromName(t);
                 if (!c2) {
+                    ++numErrors;
                     cerr << "Error: " << assignment->line << ": unrecognized "
                         << "type " << t << endl;
                     return;
@@ -171,6 +176,7 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
         } else if (ReturnStatement *retSatement = dynamic_cast<ReturnStatement *>(stmnt)) {
             string t = type(retSatement->ret, AST, scope, classScope);
             if (t == unknown) {
+                ++numErrors;
                 cerr << "Error: " << retSatement->line << ": Cannot determine "
                     << "type of rexpr " << retSatement->ret->print() << endl;
                 return;
@@ -189,6 +195,7 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
             // We just have to check to make sure we can get a type for the rexpr
             string t = type(bareStatement->expr, AST, scope, classScope);
             if (t == unknown) {
+                ++numErrors;
                 cerr << "Error: " << bareStatement->line << ": Cannot determine "
                     << "type of rexpr " << bareStatement->expr->print() << endl;
                 return;
@@ -197,12 +204,14 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
             // First we check to make sure the conditional is a subclass of Boolean
             string t = type(whileStatement->ifTrue, AST, scope, classScope);
             if (t == unknown) {
+                ++numErrors;
                 cerr << "Error: " << whileStatement->line << ":  Cannot determine "
                     << "type of rexpr " << whileStatement->ifTrue->print() << endl;
                 return;
             }
             ClassTreeNode *cl = AST->classFromName(t);
             if (!cl->inheritsFrom("Boolean")) {
+                ++numErrors;
                 cerr << "Error: " << whileStatement->line << ": Conditional "
                     << "must have a type that inherits from Boolean, which "
                     << t << " does not" << endl;
@@ -220,7 +229,7 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
                 scopeCopy = whileStatement->block.scope;
                 classScopeCopy = whileClassScope;
 
-                updateScope(whileStatement->block, AST, whileStatement->block.scope, whileClassScope, inConstructor);
+                numErrors += updateScope(whileStatement->block, AST, whileStatement->block.scope, whileClassScope, inConstructor);
             } while (whileStatement->block.scope.tokens != scopeCopy.tokens || whileClassScope.tokens != classScopeCopy.tokens);
         } else if (Conditional *conditional = dynamic_cast<Conditional *>(stmnt)) {
             // This is very similar to a while loop. First we go through and
@@ -239,7 +248,7 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
                         scopeCopy = stmnts->scope;
                         classScopeCopy = stmntsClassScope;
 
-                        updateScope(*stmnts, AST, stmnts->scope, stmntsClassScope, inConstructor);
+                        numErrors += updateScope(*stmnts, AST, stmnts->scope, stmntsClassScope, inConstructor);
                     } while (stmnts->scope.tokens != scopeCopy.tokens || stmntsClassScope.tokens != classScopeCopy.tokens);
             };
 
@@ -251,24 +260,29 @@ void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
             scope = newScope;
         }
     });
+
+    return numErrors;
 }
 
-void computeAllScopes(ClassTreeNode *AST) {
+bool computeAllScopes(ClassTreeNode *AST) {
     queue<ClassTreeNode *> toProcess;
     toProcess.push(AST);
+    int numErrors = 0;
 
     while (!toProcess.empty()) {
         ClassTreeNode *current = toProcess.front();
         toProcess.pop();
 
         // Compute scopes
-        current->populateScopes(AST);
+        numErrors += current->populateScopes(AST);
         // Add subclasses
         for_each(current->subclasses.begin(), current->subclasses.end(),
             [&] (ClassTreeNode *subclass) {
                 toProcess.push(subclass);
         });
     }
+
+    return numErrors == 0;
 }
 
 Scope intersectScopes(const Scope &s1, const Scope &s2, ClassTreeNode *AST) {

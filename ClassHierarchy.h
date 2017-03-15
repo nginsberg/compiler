@@ -72,7 +72,7 @@ public:
     bool validateConstructorArgs(std::list<std::string> argTypes, ClassTreeNode *AST);
 
     // Calculate the scope for the class and its methods.
-    void populateScopes(ClassTreeNode *AST);
+    int populateScopes(ClassTreeNode *AST);
 
     bool inheritsFrom(std::string possibleSuper);
 
@@ -92,10 +92,10 @@ std::string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,
 
 std::string leastCommonAncestor(ClassTreeNode *c1, ClassTreeNode *c2);
 
-void updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
+int updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
     Scope &classScope, bool inConstructor);
 
-void computeAllScopes(ClassTreeNode *AST);
+bool computeAllScopes(ClassTreeNode *AST);
 
 bool checkAllMethods(ClassTreeNode *AST);
 

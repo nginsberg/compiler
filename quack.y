@@ -443,15 +443,20 @@ int main(int argc, char** argv) {
 
     if (!checkAllMethods(&classHierarchy)) { return -1; }
 
-    computeAllScopes(&classHierarchy);
-    checkAllReturns(&classHierarchy);
-    checkClassScopes(&classHierarchy);
+    if (!computeAllScopes(&classHierarchy)) { return -1; }
+    if (!checkAllReturns(&classHierarchy)) { return -1; }
+    if (!checkClassScopes(&classHierarchy)) { return -1; }
 
+    int numErrors = 0;
     Scope mainScope, scopeCopy, emptyScope;
     do {
         scopeCopy = mainScope;
-        updateScope(*stmts, &classHierarchy, mainScope, emptyScope, false);
+        numErrors += updateScope(*stmts, &classHierarchy, mainScope, emptyScope, false);
     } while (scopeCopy.tokens != mainScope.tokens);
+
+    if (numErrors) { return -1; }
+
+    cout << "Passed static checks." << endl;
 
     return 0;
 }

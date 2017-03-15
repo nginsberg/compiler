@@ -325,18 +325,19 @@ bool ClassTreeNode::validateConstructorArgs(list<string> argTypes, ClassTreeNode
     return true;
 }
 
-void ClassTreeNode::populateScopes(ClassTreeNode *AST) {
+int ClassTreeNode::populateScopes(ClassTreeNode *AST) {
     Scope currentScope;
     Scope currentClassScope;
     stmts.scope.addFormalArgs(fArgs);
     stmts.scope.tokens["this"] = className;
+    int numErrors = 0;
     do {
         do {
             currentClassScope = scope;
             currentScope = stmts.scope;
 
             // First we process the constructor
-            updateScope(stmts, AST, stmts.scope, scope, true);
+            numErrors += updateScope(stmts, AST, stmts.scope, scope, true);
         } while(currentScope.tokens != stmts.scope.tokens || currentClassScope.tokens != scope.tokens);
         stmts.scope.addReturn();
 
@@ -349,11 +350,13 @@ void ClassTreeNode::populateScopes(ClassTreeNode *AST) {
             do {
                 methodScope = m->stmts.scope;
                 classScopeCopy = scope;
-                updateScope(m->stmts, AST, m->stmts.scope, scope, false);
+                numErrors += updateScope(m->stmts, AST, m->stmts.scope, scope, false);
             } while(methodScope.tokens != m->stmts.scope.tokens || classScopeCopy.tokens != scope.tokens);
             m->stmts.scope.addReturn();
         }
     } while(currentScope.tokens != stmts.scope.tokens || currentClassScope.tokens != scope.tokens);
+
+    return numErrors;
 }
 
 bool ClassTreeNode::inheritsFrom(string possibleSuper) {
