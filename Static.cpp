@@ -363,7 +363,55 @@ bool checkAllReturns(ClassTreeNode *AST) {
     return true;
 }
 
+bool checkClassScopes(ClassTreeNode *AST) {
+    queue<ClassTreeNode *>toProcess;
+    toProcess.push(AST);
 
+    int numErrors = 0;
+    while(!toProcess.empty()) {
+        ClassTreeNode *current = toProcess.front();
+        toProcess.pop();
+
+        for_each(current->subclasses.begin(), current->subclasses.end(),
+            [&] (ClassTreeNode *subclass) {
+                for (auto v = current->scope.tokens.begin(); v != current->scope.tokens.end(); ++v) {
+                    string type = v->second;
+                    auto subV = subclass->scope.tokens.find(v->first);
+                    if (subV == subclass->scope.tokens.end()) {
+                        cerr << "Error: " << current->className << " contains "
+                            << "a member " << v->first << " which is never "
+                            << "defined in its subclass " << subclass->className
+                            << "." << endl;
+                        ++numErrors;
+                        return;
+                    }
+
+                    ClassTreeNode *subVClass = AST->classFromName(subV->second);
+                    if (!subVClass) {
+                        cerr << "Error: Class " << subV->second << " does not "
+                            << "exist." << endl;
+                        ++numErrors;
+                        return;
+                    }
+                    if (!subVClass->inheritsFrom(type)) {
+                        cerr << "Error: " << current->className << " contains "
+                            << "a member " << v->first << " which is redifined"
+                            << " to a type that is not a subclass of "
+                            << v->second << "." << endl;
+                        ++numErrors;
+                        return;
+                    }
+                }
+            });
+
+        for_each(current->subclasses.begin(), current->subclasses.end(),
+            [&] (ClassTreeNode *subclass) {
+                toProcess.push(subclass);
+        });
+    }
+
+    return numErrors == 0;
+}
 
 
 
