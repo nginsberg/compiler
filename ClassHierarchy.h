@@ -99,6 +99,8 @@ void computeAllScopes(ClassTreeNode *AST);
 
 bool checkAllMethods(ClassTreeNode *AST);
 
+bool checkAllReturns(ClassTreeNode *AST);
+
 std::ostream &operator<<(std::ostream &os, const ClassTreeNode &ctn);
 
 void makeSureTableIsEmpty(const Classes &cls);

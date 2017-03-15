@@ -326,7 +326,42 @@ bool checkAllMethods(ClassTreeNode *AST) {
     return true;
 }
 
+bool checkAllReturns(ClassTreeNode *AST) {
+    queue<ClassTreeNode *>toProcess;
+    toProcess.push(AST);
 
+    while(!toProcess.empty()) {
+        ClassTreeNode *current = toProcess.front();
+        toProcess.pop();
+
+        // We don't want to check return types for our function stubs in the
+        // default classes since they clearly are wrong.
+        bool skip = false;
+        if (current->className == "Obj")     { skip = true; }
+        if (current->className == "Int")     { skip = true; }
+        if (current->className == "String")  { skip = true; }
+        if (current->className == "Nothing") { skip = true; }
+        if (current->className == "Boolean") { skip = true; }
+
+        if (!skip) {
+            for (auto m = current->methods.methods.begin(); m != current->methods.methods.end(); ++m) {
+                if (!m->checkRetType()) {
+                    cerr << "Error: " << m->line << ": Method returned "
+                        << m->stmts.scope.tokens.find("$return")->second
+                        << " but was expected to return " << m->retType << endl;
+                    return false;
+                }
+            }
+        }
+
+        for_each(current->subclasses.begin(), current->subclasses.end(),
+            [&] (ClassTreeNode *subclass) {
+                toProcess.push(subclass);
+        });
+    }
+
+    return true;
+}
 
 
 

@@ -444,6 +444,7 @@ int main(int argc, char** argv) {
     if (!checkAllMethods(&classHierarchy)) { return -1; }
 
     computeAllScopes(&classHierarchy);
+    checkAllReturns(&classHierarchy);
 
 
     Scope mainScope, scopeCopy, emptyScope;

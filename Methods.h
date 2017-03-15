@@ -37,6 +37,7 @@ public:
     Method(std::string n, FormalArgs args, std::string r, Statements ss, int l):
         name(n), retType(r), fArgs(args), stmts(ss), line(l) {}
     bool determineIfOverrideOk(ClassTreeNode *owner, ClassTreeNode *AST);
+    bool checkRetType();
 
     std::string name;
     std::string retType;
