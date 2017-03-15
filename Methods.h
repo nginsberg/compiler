@@ -18,6 +18,8 @@ public:
 
 std::ostream &operator<<(std::ostream &os, const FormalArg &formalArg);
 
+class ClassTreeNode;
+
 class FormalArgs {
 public:
     FormalArgs() {}
@@ -25,11 +27,10 @@ public:
     std::list<FormalArg> fArgs;
 
     std::string toString() const;
+    bool typesExist(ClassTreeNode *AST) const;
 };
 
 std::ostream &operator<<(std::ostream &os, const FormalArgs &formalArgs);
-
-class ClassTreeNode;
 
 class Method {
 public:

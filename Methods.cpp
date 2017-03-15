@@ -93,6 +93,13 @@ string FormalArgs::toString() const {
     return ret;
 }
 
+bool FormalArgs::typesExist(ClassTreeNode *AST) const {
+    for (auto arg = fArgs.begin(); arg != fArgs.end(); ++arg) {
+        if (!AST->classFromName(arg->type)) { return false; }
+    }
+    return true;
+}
+
 ostream &operator<<(ostream &os, const FormalArgs &formalArgs) {
     for_each(formalArgs.fArgs.begin(), formalArgs.fArgs.end(), [&] (FormalArg arg) {
         os << arg << " ";

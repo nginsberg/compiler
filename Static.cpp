@@ -292,6 +292,20 @@ bool checkAllMethods(ClassTreeNode *AST) {
         ClassTreeNode *current = toProcess.front();
         toProcess.pop();
 
+        if (!current->fArgs.typesExist(AST)) {
+            cerr << "Error: " << current->line << ": Constructor defined with "
+                << "arguements of unknown type." << endl;
+            return false;
+        }
+
+        for (auto m = current->methods.methods.begin(); m != current->methods.methods.end(); ++m) {
+            if (!m->fArgs.typesExist(AST)) {
+                cerr << "Error: " << m->line << ": Method defined with "
+                    << "arguements of unknown type." << endl;
+                return false;
+            }
+        }
+
         if (!current->methods.determineIfUnique()) { return false; }
 
         for (auto m = current->methods.methods.begin(); m != current->methods.methods.end(); ++m) {
