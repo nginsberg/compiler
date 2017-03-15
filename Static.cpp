@@ -304,6 +304,11 @@ bool checkAllMethods(ClassTreeNode *AST) {
                     << "arguements of unknown type." << endl;
                 return false;
             }
+            if (!AST->classFromName(m->retType)) {
+                cerr << "Error: " << m->line << ": Unknown declared return "
+                    << "type " << m->retType << "." << endl;
+                return false;
+            }
         }
 
         if (!current->methods.determineIfUnique()) { return false; }
