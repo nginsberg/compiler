@@ -12,6 +12,7 @@
     #include "Methods.h"
     #include "Expressions.h"
     #include "Statements.h"
+    #include "Generate.h"
     #include "gc.h"
 
     using namespace std;
@@ -456,7 +457,7 @@ int main(int argc, char** argv) {
 
     if (numErrors) { return -1; }
 
-    cout << "Passed static checks." << endl;
+    cout << generateCode(&classHierarchy) << endl;
 
     return 0;
 }

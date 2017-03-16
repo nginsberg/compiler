@@ -1,5 +1,5 @@
-SOURCES = ClassHierarchy.cpp Methods.cpp Expressions.cpp Statements.cpp Static.cpp
-HEADERS = ClassHierarchy.h Methods.h Expressions.h Statements.h
+SOURCES = ClassHierarchy.cpp Methods.cpp Expressions.cpp Statements.cpp Static.cpp Generate.cpp
+HEADERS = ClassHierarchy.h Methods.h Expressions.h Statements.h Generate.h
 OBJECTS = $(SOURCES:.cpp=.o)
 DOTS = graph/ast.dot
 GRAPHS = $(DOTS:.dot=.png)
@@ -31,7 +31,7 @@ quack.tab.c quack.tab.h: quack.y
 lex.yy.c: quack.l quack.tab.h
 	flex quack.l
 
-parser: lex.yy.c quack.tab.c quack.tab.h $(OBJECTS)
+parser: lex.yy.c quack.tab.c quack.tab.h $(OBJECTS) $(HEADERS)
 	g++ -std=c++11 $(OBJECTS) quack.tab.c lex.yy.c $(LIBS) $(WARN) -o $@
 
 clean:
