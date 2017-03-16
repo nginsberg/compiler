@@ -48,3 +48,5 @@ out
 *.tab.h
 *.tab.c
 *.png
+
+out\.c

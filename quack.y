@@ -1,6 +1,7 @@
 %{
     #include <cstdio>
     #include <iostream>
+    #include <fstream>
     #include <memory>
     #include <string.h>
     #include <memory>
@@ -431,6 +432,10 @@ int main(int argc, char** argv) {
     // set lex to read from it instead of defaulting to STDIN:
     yyin = myfile;
 
+    string outName = "out.c";
+    if (argc >= 3) { outName = argv[2]; }
+    ofstream outFile;
+    outFile.open(outName);
 
     // lex through the input:
     do {
@@ -457,7 +462,7 @@ int main(int argc, char** argv) {
 
     if (numErrors) { return -1; }
 
-    cout << generateCode(&classHierarchy) << endl;
+    outFile << generateCode(&classHierarchy) << endl;
 
     return 0;
 }
