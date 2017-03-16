@@ -9,4 +9,6 @@ std::string generateCode(ClassTreeNode *AST);
 
 std::string generateStructsForClass(ClassTreeNode *c, ClassTreeNode *AST);
 
+std::string generateObjStructContents(ClassTreeNode *c);
+
 #endif

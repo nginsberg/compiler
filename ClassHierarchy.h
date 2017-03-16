@@ -85,6 +85,8 @@ public:
     FormalArgs fArgs;
     Statements stmts;
     Scope scope;
+
+    std::vector<std::string> scopeOrder;
 };
 
 std::string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,

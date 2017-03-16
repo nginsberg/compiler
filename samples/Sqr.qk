@@ -43,6 +43,7 @@ class Rect(ll: Pt, ur: Pt) extends Obj {
   this.ll = ll;
   this.ur = ur;
   this.num = 5;
+  this.z = 5;
 
   def translate(delta: Pt) : Rect { return Rect(this.ll+delta, this.ur+delta); }
 
@@ -60,6 +61,17 @@ class Square(ll: Pt, side: Int) extends Rect {
   this.ll = ll;
   this.ur = Pt(this.ll._x() + side, this.ll._y() + side);
   this.num = 5;
+  this.z = 7;
+  this.a = 9;
+}
+
+class Test() extends Square {
+  this.ll = Pt(3,3);
+  this.ur = Pt(3,3);
+  this.num = 5;
+  this.z = 7;
+  this.a = 6;
+  this.foom = "boom";
 }
 
 a_square = Square( Pt(3,3), 5 );
