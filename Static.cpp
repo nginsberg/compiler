@@ -229,7 +229,9 @@ int updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
                 scopeCopy = whileStatement->block.scope;
                 classScopeCopy = whileClassScope;
 
-                numErrors += updateScope(whileStatement->block, AST, whileStatement->block.scope, whileClassScope, inConstructor);
+                int num = updateScope(whileStatement->block, AST, whileStatement->block.scope, whileClassScope, inConstructor);
+                numErrors += num;
+                if (num) { break; }
             } while (whileStatement->block.scope.tokens != scopeCopy.tokens || whileClassScope.tokens != classScopeCopy.tokens);
         } else if (Conditional *conditional = dynamic_cast<Conditional *>(stmnt)) {
             // This is very similar to a while loop. First we go through and
@@ -248,7 +250,9 @@ int updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
                         scopeCopy = stmnts->scope;
                         classScopeCopy = stmntsClassScope;
 
-                        numErrors += updateScope(*stmnts, AST, stmnts->scope, stmntsClassScope, inConstructor);
+                        int num = updateScope(*stmnts, AST, stmnts->scope, stmntsClassScope, inConstructor);
+                        numErrors += num;
+                        if (num) { break; }
                     } while (stmnts->scope.tokens != scopeCopy.tokens || stmntsClassScope.tokens != classScopeCopy.tokens);
             };
 

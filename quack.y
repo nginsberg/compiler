@@ -457,7 +457,9 @@ int main(int argc, char** argv) {
     Scope mainScope, scopeCopy, emptyScope;
     do {
         scopeCopy = mainScope;
-        numErrors += updateScope(*stmts, &classHierarchy, mainScope, emptyScope, false);
+        int num = updateScope(*stmts, &classHierarchy, mainScope, emptyScope, false);
+        numErrors += num;
+        if (num) { break; }
     } while (scopeCopy.tokens != mainScope.tokens);
 
     if (numErrors) { return -1; }

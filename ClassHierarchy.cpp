@@ -332,12 +332,15 @@ int ClassTreeNode::populateScopes(ClassTreeNode *AST) {
     stmts.scope.tokens["this"] = className;
     int numErrors = 0;
     do {
+        int prevErrors = numErrors;
         do {
             currentClassScope = scope;
             currentScope = stmts.scope;
 
             // First we process the constructor
-            numErrors += updateScope(stmts, AST, stmts.scope, scope, true);
+            int num = updateScope(stmts, AST, stmts.scope, scope, true);
+            numErrors += num;
+            if (num) { break; }
         } while(currentScope.tokens != stmts.scope.tokens || currentClassScope.tokens != scope.tokens);
         stmts.scope.addReturn();
 
@@ -350,10 +353,13 @@ int ClassTreeNode::populateScopes(ClassTreeNode *AST) {
             do {
                 methodScope = m->stmts.scope;
                 classScopeCopy = scope;
-                numErrors += updateScope(m->stmts, AST, m->stmts.scope, scope, false);
+                int num = updateScope(m->stmts, AST, m->stmts.scope, scope, false);
+                numErrors += num;
+                if (num) { break; }
             } while(methodScope.tokens != m->stmts.scope.tokens || classScopeCopy.tokens != scope.tokens);
             m->stmts.scope.addReturn();
         }
+        if (numErrors - prevErrors) { break; }
     } while(currentScope.tokens != stmts.scope.tokens || currentClassScope.tokens != scope.tokens);
 
     return numErrors;
