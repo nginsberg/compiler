@@ -28,6 +28,14 @@ bool Methods::determineIfUnique() {
     return true;
 }
 
+Method Methods::methodForName(std::string name) {
+    auto fallback = methods.begin();
+    for (auto m = methods.begin(); m != methods.end(); ++m) {
+        if (m->name == name) { return *m; }
+    }
+    return *fallback;
+}
+
 ostream &operator<<(ostream &os, const Methods &mthds) {
     for_each(mthds.methods.begin(), mthds.methods.end(), [&] (Method m) {
         os << m << endl;

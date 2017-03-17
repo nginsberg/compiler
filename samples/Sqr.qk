@@ -63,6 +63,8 @@ class Square(ll: Pt, side: Int) extends Rect {
   this.num = 5;
   this.z = 7;
   this.a = 9;
+
+  def hi() : String { return "hi"; }
 }
 
 class Test() extends Square {

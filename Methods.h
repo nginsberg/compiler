@@ -52,6 +52,7 @@ class Methods {
 public:
     std::list<Method> methods;
     bool determineIfUnique();
+    Method methodForName(std::string name);
 };
 
 std::ostream &operator<<(std::ostream &os, const Methods &mthds);

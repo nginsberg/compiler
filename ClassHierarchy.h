@@ -52,6 +52,11 @@ std::ostream &operator<<(std::ostream &os, const Classes &cls);
 
 /****************************** CLASS TREE ******************************/
 
+struct MethodTableEntry {
+    std::string methodName;
+    std::string generatedSignature;
+};
+
 class ClassTreeNode {
 public:
     // Removes classes from table as it adds them - makes it easy to check
@@ -87,6 +92,7 @@ public:
     Scope scope;
 
     std::vector<std::string> scopeOrder;
+    std::vector<MethodTableEntry> methodTable;
 };
 
 std::string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope,

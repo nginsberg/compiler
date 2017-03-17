@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 
+#include "Methods.h"
 #include "ClassHierarchy.h"
 #include "Generate.h"
 
@@ -32,6 +33,10 @@ string generateCode(ClassTreeNode *AST) {
             forwardDecs += "\n";
             structDefs += generateStructsForClass(current);
             structDefs += "\n";
+        }
+
+        if (skip) {
+            generateClassStructContents(current); // So we have method tables
         }
 
         for_each(current->subclasses.begin(), current->subclasses.end(),
@@ -68,6 +73,7 @@ string generateStructsForClass(ClassTreeNode *c) {
     ret += "};\n";
     ret += "\n";
     ret += "struct class_" + c->className + "_struct {\n";
+    ret += generateClassStructContents(c);
     ret += "};\n";
 
     return ret;
@@ -84,7 +90,6 @@ string generateObjStructContents(ClassTreeNode *c) {
     }
 
     for (auto var = c->scope.tokens.begin(); var != c->scope.tokens.end(); ++var) {
-        auto v = find(c->scopeOrder.begin(), c->scopeOrder.end(), var->first);
         if (find(c->scopeOrder.begin(), c->scopeOrder.end(), var->first) == c->scopeOrder.end()) {
             c->scopeOrder.push_back(var->first);
         }
@@ -94,6 +99,65 @@ string generateObjStructContents(ClassTreeNode *c) {
     for (int i = 0; i < c->scopeOrder.size(); ++i) {
         auto var = c->scope.tokens.find(c->scopeOrder[i]);
         ret += "\tobj_" + var->second + " " + var->first + ";\n";
+    }
+
+    return ret;
+}
+
+string generateTypeList(FormalArgs args) { return ""; }
+
+string generateMethodSignature(Method m) {
+    string ret = "";
+    ret += m.name;
+    return ret;
+}
+
+string generateClassStructContents(ClassTreeNode *c) {
+    string ret = "";
+
+    // First the constructor
+    ret += "\tobj_" + c->className + " (*constructor) (" + generateTypeList(c->fArgs) + ");\n";
+
+    // Here's the plan: Make a list of our methods. Then go through our
+    // superclass' method table, either propogating the generated method
+    // signature down, or replacing it if we override it. Then add any extra
+    // methods that are new. Then we just print our method table.
+
+    // Make the list of methods
+    list<string> methodNames;
+    for (auto m = c->methods.methods.begin(); m != c->methods.methods.end(); ++m) {
+        methodNames.push_back(m->name);
+    }
+
+    // Go through the super's method table and add it to ours
+    if (c->superclass) {
+        for (int i = 0; i < c->superclass->methodTable.size(); ++i) {
+            string name = c->superclass->methodTable[i].methodName;
+            cout << c->className << " " << name << endl;
+            if (find(methodNames.begin(), methodNames.end(), name) == methodNames.end()) {
+                // We didn't override this method, so just copy it over.
+                c->methodTable.push_back(c->superclass->methodTable[i]);
+            } else {
+                methodNames.erase(find(methodNames.begin(), methodNames.end(), name));
+                MethodTableEntry override;
+                override.methodName = name;
+                override.generatedSignature = generateMethodSignature(c->methods.methodForName(name));
+                c->methodTable.push_back(override);
+            }
+        }
+    }
+
+    // Now add all the methods that are left
+    for (auto name = methodNames.begin(); name != methodNames.end(); ++name) {
+        MethodTableEntry newMethod;
+        newMethod.methodName = *name;
+        newMethod.generatedSignature = generateMethodSignature(c->methods.methodForName(*name));
+        c->methodTable.push_back(newMethod);
+    }
+
+    // Now we can finally print out our method table
+    for (int i = 0; i < c->methodTable.size(); ++i) {
+        ret += "\t" + c->methodTable[i].generatedSignature + "\n";
     }
 
     return ret;
