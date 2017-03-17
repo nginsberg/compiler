@@ -104,11 +104,20 @@ string generateObjStructContents(ClassTreeNode *c) {
     return ret;
 }
 
-string generateTypeList(FormalArgs args) { return ""; }
+string generateTypeList(FormalArgs args) {
+    string ret = "";
+
+    for (auto arg = args.fArgs.begin(); arg != args.fArgs.end(); ++arg) {
+        ret += "obj_" + arg->type;
+        if (arg != --args.fArgs.end()) { ret += ", "; }
+    }
+
+    return ret;
+}
 
 string generateMethodSignature(Method m) {
     string ret = "";
-    ret += "obj_" + m.retType + "(*" + m.name + ") (" + generateTypeList(m.fArgs) + ");";
+    ret += "obj_" + m.retType + " (*" + m.name + ") (" + generateTypeList(m.fArgs) + ");";
     return ret;
 }
 
