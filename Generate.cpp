@@ -15,6 +15,7 @@ string generateCode(ClassTreeNode *AST) {
 
     string forwardDecs = "";
     string structDefs = "";
+    string methodDefs = "";
 
     while(!toProcess.empty()) {
         ClassTreeNode *current = toProcess.front();
@@ -33,6 +34,8 @@ string generateCode(ClassTreeNode *AST) {
             forwardDecs += "\n";
             structDefs += generateStructsForClass(current);
             structDefs += "\n";
+            methodDefs += generateMethods(current);
+            methodDefs += "\n";
         }
 
         if (skip) {
@@ -46,7 +49,7 @@ string generateCode(ClassTreeNode *AST) {
     }
 
     string ret = "#include \"Builtins.h\"\n\n";
-    ret += forwardDecs + structDefs;
+    ret += forwardDecs + structDefs + methodDefs;
     ret += "int main() { return 0; }\n";
     return ret;
 }
@@ -104,11 +107,32 @@ string generateObjStructContents(ClassTreeNode *c) {
     return ret;
 }
 
+string generateMethods(ClassTreeNode *c) {
+    string ret = "";
+
+    for (auto m = c->methods.methods.begin(); m!= c->methods.methods.end(); ++m) {
+        ret += generateMethod(*m, c->className);
+    }
+
+    return ret;
+}
+
 string generateTypeList(FormalArgs args) {
     string ret = "";
 
     for (auto arg = args.fArgs.begin(); arg != args.fArgs.end(); ++arg) {
         ret += "obj_" + arg->type;
+        if (arg != --args.fArgs.end()) { ret += ", "; }
+    }
+
+    return ret;
+}
+
+string generateArgList(FormalArgs args) {
+    string ret = "";
+
+    for (auto arg = args.fArgs.begin(); arg != args.fArgs.end(); ++arg) {
+        ret += "obj_" + arg->type  + " " + arg->var;
         if (arg != --args.fArgs.end()) { ret += ", "; }
     }
 
@@ -168,6 +192,17 @@ string generateClassStructContents(ClassTreeNode *c) {
     for (int i = 0; i < c->methodTable.size(); ++i) {
         ret += "\t" + c->methodTable[i].generatedSignature + "\n";
     }
+
+    return ret;
+}
+
+string generateMethod(Method m, std::string thisType) {
+    string ret = "";
+    string spacer = m.fArgs.fArgs.size() ? ", " : "";
+
+    // Signature
+    ret += "obj_" + m.retType + " " + thisType + "_method_" + m.name + "(obj_" + thisType + " this" + spacer + generateArgList(m.fArgs) + ") {\n";
+    ret += "}\n";
 
     return ret;
 }
