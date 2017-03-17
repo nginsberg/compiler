@@ -7,7 +7,9 @@
 
 std::string generateCode(ClassTreeNode *AST);
 
-std::string generateStructsForClass(ClassTreeNode *c, ClassTreeNode *AST);
+std::string generateForwardDecsForClass(ClassTreeNode *c);
+
+std::string generateStructsForClass(ClassTreeNode *c);
 
 std::string generateObjStructContents(ClassTreeNode *c);
 

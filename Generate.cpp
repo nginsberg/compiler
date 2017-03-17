@@ -9,9 +9,11 @@
 using namespace std;
 
 string generateCode(ClassTreeNode *AST) {
-    string ret = "";
     queue<ClassTreeNode *>toProcess;
     toProcess.push(AST);
+
+    string forwardDecs = "";
+    string structDefs = "";
 
     while(!toProcess.empty()) {
         ClassTreeNode *current = toProcess.front();
@@ -26,8 +28,10 @@ string generateCode(ClassTreeNode *AST) {
         if (current->className == "Boolean") { skip = true; }
 
         if (!skip) {
-            ret += generateStructsForClass(current, AST);
-            ret += "\n";
+            forwardDecs += generateForwardDecsForClass(current);
+            forwardDecs += "\n";
+            structDefs += generateStructsForClass(current);
+            structDefs += "\n";
         }
 
         for_each(current->subclasses.begin(), current->subclasses.end(),
@@ -36,18 +40,30 @@ string generateCode(ClassTreeNode *AST) {
         });
     }
 
+    string ret = forwardDecs + structDefs;
     return ret;
 }
 
-string generateStructsForClass(ClassTreeNode *c, ClassTreeNode *AST) {
+string generateForwardDecsForClass(ClassTreeNode *c) {
     string ret = "";
 
     ret += "struct class_" + c->className + "_struct;\n";
     ret += "typedef struct class_" + c->className + "_struct* class_" + c->className + ";\n";
+    ret += "extern class_" + c->className + " the_class_" + c->className + ";\n";
     ret += "\n";
-    ret += "typedef struct obj_" + c->className + "_struct {\n";
+    ret += "struct obj_" + c->className + "_struct;\n";
+    ret += "typedef struct obj_" + c->className + "_struct* obj_" + c->className + ";\n";
+    ret += "\n";
+
+    return ret;
+}
+
+string generateStructsForClass(ClassTreeNode *c) {
+    string ret = "";
+
+    ret += "struct obj_" + c->className + "_struct {\n";
     ret += generateObjStructContents(c);
-    ret += "} * obj_" + c->className + ";\n";
+    ret += "};\n";
     ret += "\n";
     ret += "struct class_" + c->className + "_struct {\n";
     ret += "};\n";
