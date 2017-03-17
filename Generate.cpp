@@ -108,7 +108,7 @@ string generateTypeList(FormalArgs args) { return ""; }
 
 string generateMethodSignature(Method m) {
     string ret = "";
-    ret += m.name;
+    ret += "obj_" + m.retType + "(*" + m.name + ") (" + generateTypeList(m.fArgs) + ");";
     return ret;
 }
 
@@ -133,7 +133,6 @@ string generateClassStructContents(ClassTreeNode *c) {
     if (c->superclass) {
         for (int i = 0; i < c->superclass->methodTable.size(); ++i) {
             string name = c->superclass->methodTable[i].methodName;
-            cout << c->className << " " << name << endl;
             if (find(methodNames.begin(), methodNames.end(), name) == methodNames.end()) {
                 // We didn't override this method, so just copy it over.
                 c->methodTable.push_back(c->superclass->methodTable[i]);
