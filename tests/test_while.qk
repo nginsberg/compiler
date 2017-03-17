@@ -1,0 +1,22 @@
+class A() {
+    this.z = 1;
+    this.x = 2;
+
+    while(true){
+        this.y = 1;  // this should not be a data member
+        this.x = "hi";
+    }
+
+    def get_z() : Int {
+        return this.z;  // this should be ok
+    }
+
+    def get_y() : Int {
+        return this.y;  // this should throw an error
+    }
+
+    def get_x() : Int {
+        return this.x;  // this should throw an error
+    }
+
+}

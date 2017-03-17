@@ -1,0 +1,76 @@
+class Pt(x : Int, y : Int) {
+    this.x = x;
+    this.y = y;
+    
+    def GetX() : Int {
+        return this.x;
+    }
+    
+    def GetY() : Int {
+        return this.y;
+    }
+}
+
+class Pt3D(x : Int, y : Int, z : Int) extends Pt {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    
+    def GetZ() : Int {
+        return this.z;
+    }
+}
+
+class Shape(origin : Pt) {
+    this.origin = origin;
+    this.name = "Shape";
+}
+
+class Shape2D() extends Shape {
+    this.name = "Shape2D";
+    this.origin = Pt(0,0);
+    this.bbox_min = Pt(0,0);
+    this.bbox_max = Pt(0,0);
+    
+    def Area() : Int {
+        return 0;
+    }
+}
+
+class Shape3D() extends Shape {
+    this.name = "Shape3D";
+    this.origin = Pt3D(0,0,0);
+    this.bbox_min = Pt3D(0,0,0);
+    this.bbox_max = Pt3D(0,0,0);
+    
+    def Volume() : Int {
+        return 0;
+    }
+}
+
+class Square(BottomLeft : Pt, TopRight : Pt) extends Shape2D {
+    this.name = "Square";
+    this.origin = Pt((TopRight.GetX() - BottomLeft.GetX())/2 + BottomLeft.GetX(), (TopRight.GetY() - BottomLeft.GetY())/2 + BottomLeft.GetY());
+    this.bbox_min = BottomLeft;
+    this.bbox_max = TopRight;
+    
+    def Area() : Int {
+        return (this.bbox_max.GetX() - this.bbox_min.GetX()) * 
+               (this.bbox_max.GetY() - this.bbox_min.GetY());
+    }
+}
+
+class Cube(BottomFrontLeft : Pt3D, TopBackRight : Pt3D) extends Shape3D {
+    this.name = "Cube";
+    this.origin = Pt3D((TopBackRight.GetX() - BottomFrontLeft.GetX())/2 + BottomFrontLeft.GetX(), 
+                       (TopBackRight.GetY() - BottomFrontLeft.GetY())/2 + BottomFrontLeft.GetY(), 
+                       (TopBackRight.GetZ() - BottomFrontLeft.GetZ())/2 + BottomFrontLeft.GetZ());
+    this.bbox_min = BottomFrontLeft;
+    this.bbox_max = TopBackRight;
+    
+    def Area() : Int {
+        return (this.bbox_max.GetX() - this.bbox_min.GetX()) * 
+               (this.bbox_max.GetY() - this.bbox_min.GetY()) * 
+               (this.bbox_max.GetZ() - this.bbox_min.GetZ());
+    }
+}

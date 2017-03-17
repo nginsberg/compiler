@@ -1,0 +1,52 @@
+/**
+ * Inheriting instance variables --- must be
+ * consistently initialized.
+ */
+class Robot(n : String) {
+    x = n;
+    y = 4;
+    // y : String = 2;  // throws error!
+    z = "hi";
+    // w : String = 2;  // throws error!
+    // n : Int = 2;  // throws error!
+    // n = 2; // this doesn't currently raise an error ... should it?
+
+    b = a;
+
+    this.name = "Bozotron";
+    this.lastname = n;
+    this.age = 42;
+    this.strength = 100;
+
+    def destroy_city(fierceness: Int ) : Int {
+    	/* TBD: how do we actually destroy things? */
+        return 5;
+    }
+
+    def destroy_city2() : Int {
+        return this.destroy_city(1000);
+    }
+
+    def test_method() : Obj{
+        return 7;
+    }
+}
+
+
+class SmartRobot(iq: Int) extends Robot {
+    this.name = "Einsteinitron";  
+    this.lastname = "asdf";
+    this.age = 48;                  // ERROR, not an Int
+    this.iq = 2 * iq;            
+    this.strength = iq;
+    z = Robot("4");
+}
+
+my_string = "hi";
+my_int = 2;
+my_robot = Robot(my_string);
+my_smart_robot = SmartRobot(my_int);
+
+b = a;
+
+another_robot = Robot(my_typo);

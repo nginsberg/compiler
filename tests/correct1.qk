@@ -1,0 +1,30 @@
+class A() {
+    this.foo = 1;
+    this.bar = 2;
+    
+    def fun() : String {
+        return "blah";
+    }
+}
+
+class B() extends A {
+    this.foo = -1;
+    this.bar = 2*2;
+    
+    def fun() : String {
+        return "blah" + "blah";
+    }
+}
+
+class C() extends B {
+    this.foo = 0;
+    this.bar = 1/2;
+    
+    def fun() : String {
+        return "";
+    }
+}
+
+varA = C();
+varB = varA.fun();
+varC = varB + A().fun();

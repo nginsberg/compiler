@@ -1,0 +1,89 @@
+class animal() {
+    this.name = "animal";
+    this.sound = "";
+
+    def speak() : String {
+        return this.sound;
+    }
+}
+
+class dog() extends animal {
+    this.name = "dog";
+    this.sound = "bark";
+
+    def speak() : String {
+        return this.sound + " " + this.sound;
+    }
+}
+
+class cat() extends animal {
+    this.name = "cat";
+    this.sound = "meow";
+
+    def action() : String {
+        return this.name + " knocks a vase off a table";
+    }
+
+    def sleep() : Int {
+        return 14;
+    }
+
+    def sleep_more(x : Obj) : String {
+        return this.name + " loves to sleep";
+    }
+
+    def eat() : Obj {
+        return Obj();
+    }
+
+    def drink(how_much : Int) {
+        return;
+    }
+}
+
+class badfeline() extends cat {
+    this.name = "badcat";
+    this.sound = "*evil laughter*";
+
+    def action() : String {
+        return this.name + " is greedy";
+    }
+
+    def eat() : Int {
+        return -12345;
+    }
+
+    def drink(how_much : Obj) {
+        return;
+    }
+
+    def no_return_needed() : Nothing {
+        x = "this method doesn't need a return statement";
+    }
+
+    // everything below should cause issues
+    def missing_return() : Int {
+        x = 4;
+        // return x;
+    }
+
+    def speak() : Int {
+        return -1;
+    }
+
+    def action() : String {
+        return this.name + " is very greedy";
+    }
+
+    def sleep(duration : Int) : Int {
+        return duration;
+    }
+
+    def sleep_more(x : Int) : String {
+        return "causing trouble even while sleeping";
+    }
+
+    def cause_trouble(amount_of_trouble : Int, type_of_trouble : String, amount_of_trouble : Int) {
+        return;
+    }
+}

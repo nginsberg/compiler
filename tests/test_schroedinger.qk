@@ -1,0 +1,15 @@
+class Schroedinger(box: Int) {
+    if box > 0 {
+       this.living = 1;
+    } else {
+       this.dead = 0;
+    }
+
+    def is_alive() : Boolean {
+        return this.living == 1;  // this should throw an error
+    }
+
+    def is_dead() : Boolean {
+        return this.dead == 0;  // this should throw an error
+    }
+}

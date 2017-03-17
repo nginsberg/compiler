@@ -52,10 +52,16 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope, const Scope &cl
                 return unknown;
             }
 
-            // Make sure we are attempting to access data from the same class
+            // Make sure we are attempting to access data from a class we
+            // inherit from
             string thisType = scope.tokens.find("this")->second;
             string otherType = type(lexpr->expr, AST, scope, classScope);
-            if (thisType != otherType) {
+            ClassTreeNode *thisClass = AST->classFromName(thisType);
+            if (!thisClass) {
+                cerr << "Error: Cannot determine type of " << thisType << endl;
+                return unknown;
+            }
+            if (!thisClass->inheritsFrom(otherType)) {
                 cerr << "Error: " << lexpr->line << ": Attempt to access "
                     << " member value from variable of type " << otherType
                     << " in class " << thisType << endl;

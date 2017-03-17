@@ -1,0 +1,13 @@
+class Foo() {}
+
+class Bar() extends Int {}
+
+class Blargh() extends String {
+    def PLUS(other : Blargh) : Blargh {
+        return Blargh();
+    }
+}
+
+class Boop() extends Boolean {}
+
+class Null() extends Nothing {} //is this allowed?

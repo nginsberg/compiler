@@ -1,0 +1,11 @@
+x = true;
+y = 0;
+
+while(x){
+    if (y > 10){
+        x = false;
+    }
+    else{
+        y = y+1;
+    }
+}

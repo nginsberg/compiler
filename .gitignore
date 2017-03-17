@@ -51,4 +51,4 @@ out
 
 out\.c
 
-tests/
+*.out

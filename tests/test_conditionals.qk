@@ -1,0 +1,25 @@
+class Foo(){
+    this.x = 1;
+    this.y = 2;
+    this.z = "foo";
+    
+    def Bar() {
+        x = this.x;
+        y = this.y;
+        z = this.z;
+        
+        if (x < y){
+            tmp = 3;
+            tmp2 = 5;
+            y = tmp2;
+        }
+        elif (x > y){
+            tmp = 4;
+            x = tmp;
+        }
+        else{
+            tmp = "bar";
+            z = tmp;
+        }
+    }
+}

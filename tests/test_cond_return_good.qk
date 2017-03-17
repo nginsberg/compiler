@@ -1,0 +1,33 @@
+class Foo(){
+    this.x = 1;
+    this.y = 2;
+    this.z = "foo";
+
+    def Bar() : Int {
+        x = this.x;
+        y = this.y;
+        z = this.z;
+
+        /* this should be ok because every path has a return */
+        if (x < y){
+            tmp = 3;
+            tmp2 = 5;
+            y = tmp2;
+            return 2;
+        }
+        elif (x > y){
+            tmp = 4;
+            x = tmp;
+            return 1;
+        }
+        elif(false){
+            q = 3;
+            return 0;
+        }
+        else{
+            tmp = "bar";
+            z = tmp;
+            return -1;
+        }
+    }
+}

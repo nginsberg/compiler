@@ -1,0 +1,38 @@
+// I think this all works correctly now
+
+class A() {
+    this.x = 4;
+}
+
+class B() extends A {
+    this.x = 5;
+
+    a = A();
+    y = a.x;       // this should NOT throw an error (I think)
+    // note - I only allow assignment to this.XXX so types in class scopes can
+    // only be changed by statements in the class.
+    a.x = 2;       // this should throw an error
+    a.error2 = 6;  // this should throw an error -- this one is tough!
+
+    c = A().x;     // this should NOT throw an error (I think)
+    d = Q().x;     // this seg faults -- fixed!
+
+    e = C();
+    e.n = 3;       // this should throw an error
+
+    f = Z();       // should also fail
+    g = Z();       // this too
+    h = Y();       // you know we'd stop failing if you'd stop doing this to me
+                   //   Sincerely,
+                   //   The Compiler
+}
+
+class C() {
+    this.n = 5;
+    a = A();
+    y = a.x;  // this should throw an error
+}
+
+a = A();
+y = a.x;  // this should throw an error
+a.x = 7;  // this should throw an error
