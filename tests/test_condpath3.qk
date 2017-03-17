@@ -17,7 +17,7 @@ else{
     z = A();
 }
 
-res1 : B = x; // should fail 
-res2 : C = w; // should fail
-res3 : B = w; // should fail
-res3 : A = z; // should fail
+res1 = x;
+res2 = w;
+res3 = w;
+res3 = z; // should fail

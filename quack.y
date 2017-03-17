@@ -447,11 +447,12 @@ int main(int argc, char** argv) {
     // cout << classHierarchy << endl;
     makeSureTableIsEmpty(*cls); // Everything should be in classHierarchy
 
-    if (!checkAllMethods(&classHierarchy)) { return -1; }
+    bool passStatic = true;
+    if (!checkAllMethods(&classHierarchy)) { passStatic = false; }
 
-    if (!computeAllScopes(&classHierarchy)) { return -1; }
-    if (!checkAllReturns(&classHierarchy)) { return -1; }
-    if (!checkClassScopes(&classHierarchy)) { return -1; }
+    if (!computeAllScopes(&classHierarchy)) { passStatic = false; }
+    if (!checkAllReturns(&classHierarchy)) { passStatic = false; }
+    if (!checkClassScopes(&classHierarchy)) { passStatic = false; }
 
     int numErrors = 0;
     Scope mainScope, scopeCopy, emptyScope;
@@ -462,7 +463,7 @@ int main(int argc, char** argv) {
         if (num) { break; }
     } while (scopeCopy.tokens != mainScope.tokens);
 
-    if (numErrors) { return -1; }
+    if (numErrors || !passStatic) { return -1; }
 
     outFile << generateCode(&classHierarchy) << endl;
 

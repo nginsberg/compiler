@@ -5,13 +5,9 @@
 class Robot(n : String) {
     x = n;
     y = 4;
-    // y : String = 2;  // throws error!
     z = "hi";
-    // w : String = 2;  // throws error!
-    // n : Int = 2;  // throws error!
-    // n = 2; // this doesn't currently raise an error ... should it?
 
-    b = a;
+    b = a; // Error
 
     this.name = "Bozotron";
     this.lastname = n;
@@ -34,10 +30,10 @@ class Robot(n : String) {
 
 
 class SmartRobot(iq: Int) extends Robot {
-    this.name = "Einsteinitron";  
+    this.name = "Einsteinitron";
     this.lastname = "asdf";
-    this.age = 48;                  // ERROR, not an Int
-    this.iq = 2 * iq;            
+    this.age = "boo";                  // ERROR, not an Int
+    this.iq = 2 * iq;
     this.strength = iq;
     z = Robot("4");
 }

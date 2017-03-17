@@ -3,7 +3,34 @@ class Foo(){
     this.y = 2;
     this.z = "foo";
 
-    def Bar() : Obj {
-        return 2;
+    def Bar() : Int {
+        x = this.x;
+        y = this.y;
+        z = this.z;
+
+        if (x < y){
+            tmp = 3;
+            tmp2 = 5;
+            y = tmp2;
+            return 2;
+        }
+        elif (x > y){
+            tmp = 4;
+            x = tmp;
+            return 1;
+        }
+        elif(false){
+            q = 3;
+            /* this should throw an error because it's missing a return statement */
+            /* it doesn't matter that the branch is unreachable */
+            // The error that it throws is weird - it decides sometimes this will
+            // return Nothing and sometimes Int (therefore returning Obj) and
+            // Obj is not an Int
+        }
+        else{
+            tmp = "bar";
+            z = tmp;
+            return -1;
+        }
     }
 }

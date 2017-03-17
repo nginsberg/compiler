@@ -1,10 +1,10 @@
 /**
- * How should one perform type inference 
- * for variable x in this program? 
+ * How should one perform type inference
+ * for variable x in this program?
  *
- * Iterate to a fixed point (abstract interpretation)? 
- * Somehow short-circuit the walk up the type system? 
- * Impose some restriction that prevents this problem? 
+ * Iterate to a fixed point (abstract interpretation)?
+ * Somehow short-circuit the walk up the type system?
+ * Impose some restriction that prevents this problem?
  */
 
 class C1()  extends Obj {
@@ -32,11 +32,11 @@ class C4() extends C3 {
 
 
 
-/* Obviously you can extend this pattern indefintely.  
- * Now type x below ... what should happen? 
- */ 
+/* Obviously you can extend this pattern indefintely.
+ * Now type x below ... what should happen?
+ */
 
-x = C4();           
-while ( x == x ) {
+x = C4();
+while ( x.EQUAL(x) ) { // x == x doesn't work, so it does for Ints etc.
    x = x.foo();      /* Type system should reject this */
 }
