@@ -81,9 +81,10 @@ bool Method::determineIfOverrideOk(ClassTreeNode *owner, ClassTreeNode *AST) {
     return true;
 }
 
-bool Method::checkRetType() {
+bool Method::checkRetType(ClassTreeNode *AST) {
     string actual = stmts.scope.tokens.find("$return")->second;
-    return actual == retType;
+    ClassTreeNode *actualClass = AST->classFromName(actual);
+    return actualClass->inheritsFrom(retType);
 }
 
 ostream &operator<<(ostream &os, const FormalArg &formalArg) {

@@ -82,7 +82,7 @@ string type(RExpr *expr, ClassTreeNode *AST, const Scope &scope, const Scope &cl
             // Make sure the local scope has a variable of the provided name
             if (scope.tokens.find(lexpr->ident) == scope.tokens.end()) {
                 cerr << "Error: " << lexpr->line << ": Attempt to access "
-                    << " uninitialized variable " << lexpr->ident << endl;
+                    << "uninitialized variable " << lexpr->ident << endl;
                 return unknown;
             }
 
@@ -369,7 +369,7 @@ bool checkAllReturns(ClassTreeNode *AST) {
 
         if (!skip) {
             for (auto m = current->methods.methods.begin(); m != current->methods.methods.end(); ++m) {
-                if (!m->checkRetType()) {
+                if (!m->checkRetType(AST)) {
                     cerr << "Error: " << m->line << ": Method returned "
                         << m->stmts.scope.tokens.find("$return")->second
                         << " but was expected to return " << m->retType << endl;

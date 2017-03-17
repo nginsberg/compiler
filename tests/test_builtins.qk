@@ -3,6 +3,11 @@ class Foo() {}
 class Bar() extends Int {}
 
 class Blargh() extends String {
+    // This is an error! String's PLUS method takes a String, so other has
+    // to be a superclass of String, but Blargh is a subclass of String.
+    // Bottom line - don't subclass the builtins, because you can't override
+    // these methods. (This was the first error my compiler found that wasn't
+    // immediately obvious to me -- very cool!)
     def PLUS(other : Blargh) : Blargh {
         return Blargh();
     }
