@@ -275,7 +275,7 @@ statement:
     ;
 optional_r_expr:
     /* empty */ {
-        $$ = new RExpr("Nothing()");
+        $$ = new ConstructorCall(yylineno, "Nothing", ActualArgs());
     }
     | r_expr {
         $$ = $1;

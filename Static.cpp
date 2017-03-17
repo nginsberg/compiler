@@ -179,12 +179,12 @@ int updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
                 }
                 usedScope->tokens[assignment->to->ident] = leastCommonAncestor(c1, c2);
             }
-        } else if (ReturnStatement *retSatement = dynamic_cast<ReturnStatement *>(stmnt)) {
-            string t = type(retSatement->ret, AST, scope, classScope);
+        } else if (ReturnStatement *retStatement = dynamic_cast<ReturnStatement *>(stmnt)) {
+            string t = type(retStatement->ret, AST, scope, classScope);
             if (t == unknown) {
                 ++numErrors;
-                cerr << "Error: " << retSatement->line << ": Cannot determine "
-                    << "type of rexpr " << retSatement->ret->print() << endl;
+                cerr << "Error: " << retStatement->line << ": Cannot determine "
+                    << "type of rexpr " << retStatement->ret->print() << endl;
                 return;
             }
 
