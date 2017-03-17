@@ -246,6 +246,7 @@ int updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
             // a variable appears in all the scopes of the conditionals,
             // its least common ancestor is added to the main scope.
 
+            vector<Scope> newClassScopes;
             for (auto stmnts = conditional->blocks.begin(); stmnts != conditional->blocks.end(); ++stmnts) {
                     stmnts->scope = scope;
                     Scope stmntsClassScope = classScope;
@@ -260,6 +261,7 @@ int updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
                         numErrors += num;
                         if (num) { break; }
                     } while (stmnts->scope.tokens != scopeCopy.tokens || stmntsClassScope.tokens != classScopeCopy.tokens);
+                    newClassScopes.push_back(classScopeCopy);
             };
 
             Scope newScope = conditional->blocks.begin()->scope;
@@ -268,6 +270,13 @@ int updateScope(const Statements &stmts, ClassTreeNode *AST, Scope &scope,
             }
 
             scope = newScope;
+
+            Scope newClassScope = newClassScopes[0];
+            for (int i = 0; i < newClassScopes.size(); ++i) {
+                newClassScope = intersectScopes(newClassScope, newClassScopes[i], AST);
+            }
+
+            classScope = newClassScope;
         }
     });
 

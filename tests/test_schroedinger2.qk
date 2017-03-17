@@ -6,6 +6,6 @@ class Schroedinger(box: Int) {
     }
 
     def is_alive() : Boolean {
-        return this.living == 1;  // this should be ok
+        return this.living == true;  // this should be ok
     }
 }
