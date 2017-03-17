@@ -40,7 +40,9 @@ string generateCode(ClassTreeNode *AST) {
         });
     }
 
-    string ret = forwardDecs + structDefs;
+    string ret = "#include \"Builtins.h\"\n\n";
+    ret += forwardDecs + structDefs;
+    ret += "int main() { return 0; }\n";
     return ret;
 }
 
