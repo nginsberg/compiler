@@ -115,9 +115,10 @@ string generateTypeList(FormalArgs args) {
     return ret;
 }
 
-string generateMethodSignature(Method m) {
+string generateMethodSignature(Method m, string thisType) {
     string ret = "";
-    ret += "obj_" + m.retType + " (*" + m.name + ") (" + generateTypeList(m.fArgs) + ");";
+    string spacer = m.fArgs.fArgs.size() ? ", " : "";
+    ret += "obj_" + m.retType + " (*" + m.name + ") (obj_" + thisType + spacer + generateTypeList(m.fArgs) + ");";
     return ret;
 }
 
@@ -149,7 +150,7 @@ string generateClassStructContents(ClassTreeNode *c) {
                 methodNames.erase(find(methodNames.begin(), methodNames.end(), name));
                 MethodTableEntry override;
                 override.methodName = name;
-                override.generatedSignature = generateMethodSignature(c->methods.methodForName(name));
+                override.generatedSignature = generateMethodSignature(c->methods.methodForName(name), c->className);
                 c->methodTable.push_back(override);
             }
         }
@@ -159,7 +160,7 @@ string generateClassStructContents(ClassTreeNode *c) {
     for (auto name = methodNames.begin(); name != methodNames.end(); ++name) {
         MethodTableEntry newMethod;
         newMethod.methodName = *name;
-        newMethod.generatedSignature = generateMethodSignature(c->methods.methodForName(*name));
+        newMethod.generatedSignature = generateMethodSignature(c->methods.methodForName(*name), c->className);
         c->methodTable.push_back(newMethod);
     }
 

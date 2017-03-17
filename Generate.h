@@ -14,7 +14,7 @@ std::string generateStructsForClass(ClassTreeNode *c);
 
 std::string generateObjStructContents(ClassTreeNode *c);
 
-std::string generateMethodSignature(Method m);
+std::string generateMethodSignature(Method m, std::string thisType);
 
 std::string generateTypeList(FormalArgs args);
 
