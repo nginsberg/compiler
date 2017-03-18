@@ -5,6 +5,7 @@
 
 #include "ClassHierarchy.h"
 #include "Methods.h"
+#include "Statements.h"
 
 std::string generateCode(ClassTreeNode *AST);
 
@@ -25,5 +26,11 @@ std::string generateArgList(FormalArgs args);
 std::string generateClassStructContents(ClassTreeNode *c);
 
 std::string generateMethod(Method m, std::string thisType);
+
+std::string generateVarDecs(Scope s, FormalArgs passedIn);
+
+std::string generateStatements(Statements stmts);
+
+std::string generateStatement(Statement *stmt);
 
 #endif

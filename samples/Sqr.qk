@@ -16,7 +16,6 @@ class Pt(x: Int, y: Int) {
   }
 
   def upWhile(r: Rect) {
-      while (not this.b) {
           if (this.x < this.y) {
               this.x = this.x + 1;
               g = 3;
@@ -32,7 +31,6 @@ class Pt(x: Int, y: Int) {
             this.x = this.x - 1;
           }
           bar = g;
-      }
   }
 
   def _x() : Int { return this.x; }

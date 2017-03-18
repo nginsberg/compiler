@@ -112,6 +112,7 @@ string generateMethods(ClassTreeNode *c) {
 
     for (auto m = c->methods.methods.begin(); m!= c->methods.methods.end(); ++m) {
         ret += generateMethod(*m, c->className);
+        ret += "\n";
     }
 
     return ret;
@@ -202,7 +203,36 @@ string generateMethod(Method m, std::string thisType) {
 
     // Signature
     ret += "obj_" + m.retType + " " + thisType + "_method_" + m.name + "(obj_" + thisType + " this" + spacer + generateArgList(m.fArgs) + ") {\n";
+    ret += generateVarDecs(m.stmts.scope, m.fArgs);
     ret += "}\n";
 
     return ret;
 }
+
+string generateVarDecs(Scope s, FormalArgs passedIn) {
+    string ret = "";
+
+    for (auto tok = s.tokens.begin(); tok != s.tokens.end(); ++tok) {
+        // Skip it if it got passed in or if it's a return type
+        bool found = false;
+        for (auto arg = passedIn.fArgs.begin(); arg != passedIn.fArgs.end(); ++arg) {
+            if (arg->var == tok->first) {
+                found = true;
+                break;
+            }
+        }
+        if (tok->first == "this" || tok->first == "$return") {
+            found = true;
+        }
+
+        if (found) { continue; }
+
+        ret += "\tobj_" + tok->second + " " + tok->first + ";\n";
+    }
+
+    return ret;
+}
+
+string generateStatements(Statements stmts) { return ""; }
+
+string generateStatement(Statement *stmt) { return ""; }
