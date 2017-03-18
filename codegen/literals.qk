@@ -1,0 +1,11 @@
+/* Test Operating Directly on Literals */
+
+10.PRINT();
+"  <-- correct: 10".PRINT();
+"\n".PRINT();
+true.PRINT();
+"  <-- correct: true".PRINT();
+"\n".PRINT();
+(1 < 2).PRINT();
+"  <-- correct: true".PRINT();
+"\n".PRINT();

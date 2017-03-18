@@ -1,0 +1,230 @@
+/* computes some math functions on integers */
+
+class Math() {
+
+    // returns x mod m
+    def mod(x : Int, m : Int) : Int {
+        if( m < 2){
+            return -1;
+        }
+
+        q = x / m;
+        return x - q * m;
+    }
+
+    // returns x! (computed iteratively)
+    def factorial(x : Int) : Int {
+        if(x < 0){
+            return -1;
+        }
+        else{
+            res = 1;
+            while(x > 0){
+                res = res * x;
+                x = x - 1;
+            }
+            return res;
+        }
+    }
+
+    // returns x! (computed recursively)
+    def factorial_rec(x : Int) : Int {
+        if(x < 0){
+            return -1;
+        }
+        elif(x==0){
+            return 1;
+        }
+        else{
+            return x * this.factorial_rec(x-1);
+        }
+    }
+
+    // return x ^ y (computed by repeated squaring)
+    def power(x : Int, y : Int) : Int {
+        if(y < 0){
+            return -1;
+        }
+        elif(y == 0){
+            return 1;
+        }
+        else{
+            res = 1;
+            while(y > 1){
+                if(this.mod(y, 2) == 0){
+                    x = x * x;
+                    y = y / 2;
+                }
+                else{
+                    res = res * x;
+                    x = x * x;
+                    y = (y - 1) / 2;
+                }
+            }
+            return res * x;
+        }
+    }
+
+    // return floor(sqrt(x)) (computed by newton's method)
+    def sqrt(x : Int) : Int {
+        if(x < 0){
+            return -1;
+        }
+        if(x == 0){
+            return 0;
+        }
+        previous = -1;
+        current = -1;
+        next = x;
+        while(not current == next){
+            previous = current;
+            current = next;
+            next = (current + (x / current)) / 2;
+            if(previous == next){
+                return current;  // detect oscillation
+            }
+        }
+        return current;
+    }
+
+    // prime test (very slow!)
+    def is_prime(x : Int) : Boolean {
+        if(x <= 1){
+            return false;
+        }
+        else{
+            d = 2;
+            while(d < this.sqrt(x) + 1){
+                if(this.mod(x,d) == 0){
+                    return false;
+                }
+                d = d + 1;
+            }
+            return true;
+        }
+    }
+
+    // prime factorization (very very slow!)
+    def prime_factors(x : Int) : String {
+        if(x <= 1){
+            return "input > 1";
+        }
+        else{
+            res = "";
+            while(x > 1){
+                if(this.is_prime(x)){
+                    res = res + x.STR();
+                    x = 1;
+                }
+                else{
+                    found_factor = false;
+                    d = 2;
+                    while(not found_factor){
+                        if(this.mod(x,d) == 0){
+                            res = res + d.STR() + ", ";
+                            x = x / d;
+                            found_factor = true;
+                        }
+                        else{
+                            d = d + 1;
+                        }
+                    }
+                }
+            }
+            return res;
+        }
+    }
+
+}
+
+math_library = Math();
+
+"MODULAR ARITHMETIC\n".PRINT();
+"------------------\n".PRINT();
+"7 mod 2 = ".PRINT();
+math_library.mod(7,2).PRINT();
+"\n".PRINT();
+"13 mod 5 = ".PRINT();
+math_library.mod(13,5).PRINT();
+"\n".PRINT();
+"\n".PRINT();
+
+"ITERATIVE FACTORIAL\n".PRINT();
+"-------------------\n".PRINT();
+"5! = ".PRINT();
+math_library.factorial(5).PRINT();
+"\n".PRINT();
+"10! = ".PRINT();
+math_library.factorial(10).PRINT();
+"\n".PRINT();
+"\n".PRINT();
+
+"RECURSIVE FACTORIAL\n".PRINT();
+"-------------------\n".PRINT();
+"5! = ".PRINT();
+math_library.factorial_rec(5).PRINT();
+"\n".PRINT();
+"10! = ".PRINT();
+math_library.factorial_rec(10).PRINT();
+"\n".PRINT();
+"\n".PRINT();
+
+"EXPONENTS\n".PRINT();
+"---------\n".PRINT();
+"2^10 = ".PRINT();
+math_library.power(2,10).PRINT();
+"\n".PRINT();
+"5^3 = ".PRINT();
+math_library.power(5,3).PRINT();
+"\n".PRINT();
+"-5^3 = ".PRINT();
+math_library.power(-5,3).PRINT();
+"\n".PRINT();
+"\n".PRINT();
+
+"SQUARE ROOT\n".PRINT();
+"-----------\n".PRINT();
+"sqrt(24) = ".PRINT();
+math_library.sqrt(24).PRINT();
+"\n".PRINT();
+"sqrt(25) = ".PRINT();
+math_library.sqrt(25).PRINT();
+"\n".PRINT();
+"sqrt(26) = ".PRINT();
+math_library.sqrt(26).PRINT();
+"\n".PRINT();
+"sqrt(8) = ".PRINT();
+math_library.sqrt(8).PRINT();
+"\n".PRINT();
+"sqrt(9) = ".PRINT();
+math_library.sqrt(9).PRINT();
+"\n".PRINT();
+"sqrt(10) = ".PRINT();
+math_library.sqrt(10).PRINT();
+"\n".PRINT();
+"\n".PRINT();
+
+"PRIMALITY\n".PRINT();
+"---------\n".PRINT();
+"7 is prime: ".PRINT();
+math_library.is_prime(7).PRINT();
+"\n".PRINT();
+"8 is prime: ".PRINT();
+math_library.is_prime(8).PRINT();
+"\n".PRINT();
+"7877 is prime: ".PRINT();
+math_library.is_prime(7877).PRINT();
+"\n".PRINT();
+"\n".PRINT();
+
+"PRIME FACTORIZATION\n".PRINT();
+"-------------------\n".PRINT();
+"prime factorization of 7: ".PRINT();
+math_library.prime_factors(7).PRINT();
+"\n".PRINT();
+"prime factorization of 21: ".PRINT();
+math_library.prime_factors(21).PRINT();
+"\n".PRINT();
+"prime factorization of 300: ".PRINT();
+math_library.prime_factors(300).PRINT();
+"\n".PRINT();

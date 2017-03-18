@@ -1,0 +1,59 @@
+/* Test Booleans */
+
+newline = "\n";
+
+// Test simple boolean conditions
+boolA = true;
+boolB = false;
+
+if(boolB){
+    "B".PRINT();
+}
+elif(boolA){
+    "A".PRINT();
+}
+"  <-- correct: A".PRINT();
+newline.PRINT();
+
+// Test simple OR
+if(boolA or boolB){
+    "OR success".PRINT();
+}
+"  <-- correct: OR success".PRINT();
+newline.PRINT();
+
+// Test simple AND
+if(boolA and boolB){
+    (boolA and boolB).PRINT();
+}
+/* nothing should print here */
+
+// Test simple NOT
+if(not boolA){
+    "not A".PRINT();
+}
+elif(not boolB){
+    "not B".PRINT();
+}
+"  <-- correct: not B".PRINT();
+newline.PRINT();
+
+// Test complex example
+if((not (boolA and boolB)) and (not boolB)){
+    "COMPLEX success".PRINT();
+}
+"  <-- correct: COMPLEX success".PRINT();
+newline.PRINT();
+
+// Test complex boolean comparison
+intA = 1;
+intB = 2;
+
+if(intA > intB){
+    intA.PRINT();
+}
+elif((intA == intB) or (intA < intB) or (false)){
+    intB.PRINT();
+}
+"  <-- correct: 2".PRINT();
+newline.PRINT();

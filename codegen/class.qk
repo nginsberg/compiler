@@ -1,0 +1,87 @@
+/* Test Custom Class Generation and Inheritence */
+
+// Test custom class
+class Pt(x: Int, y: Int) {
+   this.x = x;
+   this.y = y;
+   z = "hi";
+
+   def PRINT( ): Pt {
+      "(".PRINT();
+      this.x.PRINT();
+      ", ".PRINT();
+      this.y.PRINT();
+      ")".PRINT();
+      return this;
+    }
+
+    def PLUS(other: Pt):Pt {
+        return Pt(this.x+other.x, this.y+other.y);
+    }
+
+    def testing_return_nothing1() : Nothing {
+        var = 4;
+    }
+
+    def testing_return_nothing2() : Nothing {
+        var = 4;
+        return;
+    }
+
+}
+
+// Test class inheritence
+class ReversePt(x: Int, y: Int) extends Pt {
+    this.y = y;
+    this.x = x;
+}
+
+x = 11;
+y = 31;
+
+// do stuff with Pt
+"Pt\n".PRINT();
+"---------\n".PRINT();
+pt1 = Pt(x,y);
+pt1.PRINT();
+"  <-- correct: (11, 31)".PRINT();
+"\n".PRINT();
+pt2 = Pt(y,x);
+pt2.PRINT();
+"  <-- correct: (31, 11)".PRINT();
+"\n".PRINT();
+pt3 = pt1 + pt2;
+pt3.PRINT();
+"  <-- correct: (42, 42)".PRINT();
+"\n".PRINT();
+"\n".PRINT();
+
+// check that the data members are in the right place in the struct for subclass
+// the output here should be the same as above
+"ReversePt\n".PRINT();
+"---------\n".PRINT();
+pt4 = ReversePt(x,y);
+pt4.PRINT();
+"  <-- correct: (11, 31)".PRINT();
+"\n".PRINT();
+pt5 = ReversePt(y,x);
+pt5.PRINT();
+"  <-- correct: (31, 11)".PRINT();
+"\n".PRINT();
+pt6 = pt4 + pt5;
+pt6.PRINT();
+"  <-- correct: (42, 42)".PRINT();
+"\n".PRINT();
+"\n".PRINT();
+
+// what happens if we add a Pt and a ReversePt?
+"MIXING\n".PRINT();
+"---------\n".PRINT();
+pt7 = pt1 + pt4;
+pt7.PRINT();
+"  <-- correct: (22, 62)".PRINT();
+"\n".PRINT();
+pt8 = pt4 + pt1;
+pt8.PRINT();
+"  <-- correct: (22, 62)".PRINT();
+"\n".PRINT();

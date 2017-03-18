@@ -1,0 +1,88 @@
+/* Test Builtin Operators */
+newline = "\n";
+
+// test integer builtins
+intA = 1;
+intA.PRINT();
+"  <-- correct: 1".PRINT();
+newline.PRINT();
+intB = 2;
+intB.PRINT();
+"  <-- correct: 2".PRINT();
+newline.PRINT();
+(intA +  intB).PRINT();
+"  <-- correct: 3".PRINT();
+newline.PRINT();
+(intA -  intB).PRINT();
+"  <-- correct: -1".PRINT();
+newline.PRINT();
+(intA *  intB).PRINT();
+"  <-- correct: 2".PRINT();
+newline.PRINT();
+(intA /  intB).PRINT();
+"  <-- correct: 0".PRINT();
+newline.PRINT();
+(intA <  intB).PRINT();
+"  <-- correct: true".PRINT();
+newline.PRINT();
+(intA <= intB).PRINT();
+"  <-- correct: true".PRINT();
+newline.PRINT();
+(intA == intB).PRINT();
+"  <-- correct: false".PRINT();
+newline.PRINT();
+(intA > intB).PRINT();
+"  <-- correct: false".PRINT();
+newline.PRINT();
+(intA >= intB).PRINT();
+"  <-- correct: false".PRINT();
+newline.PRINT();
+newline.PRINT();
+
+// test string builtins
+strA = "foo";
+strA.PRINT();
+"  <-- correct: foo".PRINT();
+newline.PRINT();
+strB = "bar";
+strB.PRINT();
+"  <-- correct: bar".PRINT();
+newline.PRINT();
+(strA +  strB).PRINT();
+"  <-- correct: foobar".PRINT();
+newline.PRINT();
+(strA < strB).PRINT();
+"  <-- correct: false".PRINT();
+newline.PRINT();
+(strA <= strB).PRINT();
+"  <-- correct: false".PRINT();
+newline.PRINT();
+(strA == strB).PRINT();
+"  <-- correct: false".PRINT();
+newline.PRINT();
+(strA >  strB).PRINT();
+"  <-- correct: true".PRINT();
+newline.PRINT();
+(strA >= strB).PRINT();
+"  <-- correct: true".PRINT();
+newline.PRINT();
+newline.PRINT();
+
+// test boolean builtins
+boolA = true;
+boolA.PRINT();
+"  <-- correct: true".PRINT();
+newline.PRINT();
+boolB = false;
+boolB.PRINT();
+"  <-- correct: false".PRINT();
+newline.PRINT();
+(boolA and boolB).PRINT();
+"  <-- correct: false".PRINT();
+newline.PRINT();
+(boolA or boolB).PRINT();
+"  <-- correct: true".PRINT();
+newline.PRINT();
+(not boolA).PRINT();
+"  <-- correct: false".PRINT();
+newline.PRINT();

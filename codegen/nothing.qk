@@ -1,0 +1,31 @@
+/* test methods that return Nothing */
+
+
+class A() {
+
+    def testing_return_nothing1() : Nothing {
+        var = 4;
+    }
+
+    def testing_return_nothing2() : Nothing {
+        var = 4;
+        return;
+    }
+
+    def testing_return_nothing3() : Nothing {
+        var = 4;
+        return Nothing();
+    }
+
+}
+
+a = A();
+a.testing_return_nothing1().PRINT();
+"  <-- correct: <nothing>".PRINT();
+"\n".PRINT();
+a.testing_return_nothing2().PRINT();
+"  <-- correct: <nothing>".PRINT();
+"\n".PRINT();
+a.testing_return_nothing3().PRINT();
+"  <-- correct: <nothing>".PRINT();
+"\n".PRINT();

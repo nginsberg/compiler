@@ -1,0 +1,28 @@
+/* Test Assignments */
+
+newline = "\n";
+
+// Test integer assignment
+intA = 1;
+intB       = 2;
+intC = intA + intB;
+intC.PRINT();
+"  <-- correct: 3".PRINT();
+newline.PRINT();
+
+// Test string assignment
+strA = "hello ";
+strB          = "world";
+strC = strA + strB;
+strC.PRINT();
+"  <-- correct: hello world".PRINT();
+newline.PRINT();
+
+// Test boolean assignment
+boolA = true;
+boolB           = false;
+boolC = boolA and boolB;
+boolD           = boolA or  boolC;
+boolD.PRINT();
+"  <-- correct: true".PRINT();
+newline.PRINT();

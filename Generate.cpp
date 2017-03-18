@@ -52,7 +52,9 @@ string generateCode(ClassTreeNode *AST) {
         });
     }
 
-    string ret = "#include \"Builtins.h\"\n\n";
+    string ret = "";
+    ret += "#include <stdlib.h>\n";
+    ret += "#include \"Builtins.h\"\n\n";
     ret += forwardDecs + structDefs + methodDefs + singletonDefs;
     return ret;
 }

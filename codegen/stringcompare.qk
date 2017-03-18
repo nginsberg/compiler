@@ -1,0 +1,22 @@
+a = "a";
+b = "b";
+c = a+b;
+
+"a = ".PRINT(); a.PRINT(); "\n".PRINT();
+"b = ".PRINT(); b.PRINT(); "\n".PRINT();
+"c = ".PRINT(); c.PRINT(); "\n".PRINT();
+("a < b: " + (a < b).STR() + "\n").PRINT(); 
+("a > b: " + (a > b).STR() + "\n").PRINT(); 
+("a <= b: " + (a <= b).STR() + "\n").PRINT();
+("a >= b: " + (a >= b).STR() + "\n").PRINT();
+("a == b: " + (a == b).STR() + "\n").PRINT();
+("c < a: " + (c < a).STR() + "\n").PRINT();
+("c < b: " + (c < b).STR() + "\n").PRINT();
+("c > a: " + (c > a).STR() + "\n").PRINT();
+("c > b: " + (c > b).STR() + "\n").PRINT();
+("c >= a: " + (c >= a).STR() + "\n").PRINT();
+("c >= b: " + (c >= b).STR() + "\n").PRINT();
+("c <= a: " + (c <= a).STR() + "\n").PRINT();
+("c <= b: " + (c <= b).STR() + "\n").PRINT();
+("c == a: " + (c == a).STR() + "\n").PRINT();
+("c == ab: " + (c == "ab").STR() + "\n").PRINT();

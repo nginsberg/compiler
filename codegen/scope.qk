@@ -1,0 +1,22 @@
+/* Test Scoping */
+
+class foo() {
+    this.x = 5;
+    x = 4;
+
+    def bar() {
+        x = 3;
+
+        if (true) {
+            x = 2;
+        }
+        else {
+            x = 1;
+        }
+        x.PRINT();
+    }
+}
+
+x = foo().bar();
+"  <-- correct: 2".PRINT();
+"\n".PRINT();

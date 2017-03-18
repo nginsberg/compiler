@@ -1,0 +1,39 @@
+/* Tests Conditional Branching */
+
+// Test if-elifs-else
+x = 3;
+y = 3;
+
+if ((x < y) or (x > y)){
+    z = x - y;
+    x = z;
+}
+elif (x > 10){
+    z = 1;
+    x = z;
+}
+else{
+    x = 2;
+}
+x.PRINT();
+"  <-- correct: 2".PRINT();
+"\n".PRINT();
+
+// Test complex conditionals
+str1 = "foo";
+str2 = "bar";
+
+("foobar" < "hello").PRINT();
+"  <-- correct: true".PRINT();
+"\n".PRINT();
+
+if((str1 + str2) < "hello"){
+    strTmp = "hello ";
+    str1 = strTmp;
+    if (str2 <= "boo"){
+        str1 = str1 + "world";
+    }
+}
+str1.PRINT();
+"  <-- correct: hello world".PRINT();
+"\n".PRINT();

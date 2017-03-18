@@ -1,0 +1,24 @@
+/* testing behavior for variable that is defined on all paths */
+
+cond1 = false;
+cond2 = true;
+
+if(cond1){
+  x = 2;
+  x.PRINT();
+}
+elif(cond2){
+  x = "foo";
+  x.PRINT();
+}
+else{
+  x = true;
+  x.PRINT();
+}
+
+"  <-- correct: foo".PRINT();
+"\n".PRINT();
+
+x.PRINT();
+"  <-- correct: foo".PRINT();
+"\n".PRINT();

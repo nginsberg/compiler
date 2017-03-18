@@ -1,0 +1,43 @@
+/* test side effects in method calls */
+
+// Test custom class
+class Counter(x: Int) {
+    this.counter = x;
+
+    def increment() : Counter {
+        this.counter = this.counter + 1;
+        return this;
+    }
+
+    def get() : Int {
+        return this.counter;
+    }
+
+    def STRING() : String {
+       return this.counter.STRING();
+    }
+
+    def PRINT() : Counter {
+        ("counter *" + this.STRING() + "*").PRINT();
+        return this;
+    }
+
+}
+
+my_counter = Counter(0);
+my_counter.PRINT();  /* this should print counter: 0 */
+"  <-- correct:  counter *0*".PRINT();
+"\n".PRINT();
+
+my_counter.increment();
+my_counter.PRINT(); /* this should print counter: 1 */
+"  <-- correct:  counter *1*".PRINT();
+"\n".PRINT();
+
+my_counter.increment().PRINT();  /* this should print counter: 2 */
+"  <-- correct:  counter *2*".PRINT();
+"\n".PRINT();
+
+my_counter.increment().increment().PRINT();  /* this should print counter: 4 */
+"  <-- correct:  counter *4*".PRINT();
+"\n".PRINT();

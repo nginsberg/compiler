@@ -8,7 +8,7 @@ class Pt(x: Int, y: Int) {
   this.b = false;
 
   def STRING() : String {
-      return this.x.STRING() + this.y.STRING();
+      return "(" + this.x.STRING() + ", " + this.y.STRING() + ")";
   }
 
   def PLUS(other: Pt) : Pt {

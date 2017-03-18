@@ -2,6 +2,9 @@ class Turtle() {
     /* should this be a type checking error or runtime misfortune? */
     // I *think* this is going to end up creating a recursive loop in the
     // runtime code.
+    // That is exactly what this does. Running the output produces a segfault.
+    // I ran the output through lldb and printed the stack trace and it was...
+    // TURTLES ALL THE WAY DOWN!!!
     this.floor = Turtle(); //Turtles all the way down
 
     def PLUS(other : Turtle) : Turtle {
@@ -16,7 +19,7 @@ class Turtle() {
 World = "";
 Atuin = Turtle();
 
-if(Atuin == Turtle()){
+if(Atuin.EQUAL(Turtle())){
     World = "Flat";
 }
 
