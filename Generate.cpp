@@ -111,6 +111,9 @@ string generateObjStructContents(ClassTreeNode *c) {
 string generateMethods(ClassTreeNode *c) {
     string ret = "";
 
+    ret += generateConstructor(c);
+    ret += "\n";
+
     for (auto m = c->methods.methods.begin(); m!= c->methods.methods.end(); ++m) {
         ret += generateMethod(*m, c->className);
         ret += "\n";
@@ -332,6 +335,19 @@ string generateExpression(RExpr *expr) {
     return expr->print();
 }
 
+string generateConstructor(ClassTreeNode *c) {
+    string ret = "";
+
+    ret += "obj_" + c->className + " new_" + c->className + "(" + generateArgList(c->fArgs) + ") {\n";
+    ret += "\tobj_" + c->className + " this = malloc(sizeof(struct obj_" + c->className + "_struct));\n";
+    ret += "\tthis->clazz = the_clas_" + c->className + ";\n";
+    ret += "\n";
+    ret += generateStatements(c->stmts, c->scope);
+    ret += "\treturn this;\n";
+    ret += "}\n";
+
+    return ret;
+}
 
 
 

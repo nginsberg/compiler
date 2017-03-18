@@ -39,4 +39,6 @@ std::string generateArgList(ActualArgs args);
 
 std::string generateExpression(RExpr *expr);
 
+std::string generateConstructor(ClassTreeNode *c);
+
 #endif
