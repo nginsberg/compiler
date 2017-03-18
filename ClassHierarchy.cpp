@@ -45,20 +45,24 @@ ClassTreeNode::ClassTreeNode(Classes &cls) {
     this->line = 0;
     this->superclass = NULL;
     Methods objMethods;
-    objMethods.methods.push_back(Method("STR", FormalArgs(), "String", Statements(), 0));
+    objMethods.methods.push_back(Method("STRING", FormalArgs(), "String", Statements(), 0));
     objMethods.methods.push_back(Method("EQUAL",
         FormalArgs(FormalArg("other", "Obj")), "Boolean", Statements(), 0));
-    objMethods.methods.push_back(Method("PRINT", FormalArgs(), "Nothing", Statements(), 0));
+    objMethods.methods.push_back(Method("PRINT", FormalArgs(), "Obj", Statements(), 0));
     methods = objMethods;
 
     // Add default subclasses
     ClassTreeNode *nothing = new ClassTreeNode("Nothing", FormalArgs(), 0, Methods(), Statements());
     nothing->superclass = this;
+    Methods nothingMethods;
+    nothingMethods.methods.push_back(Method("STRING", FormalArgs(), "String", Statements(), 0));
+    nothing->methods = nothingMethods;
     this->subclasses.push_back(nothing);
 
     ClassTreeNode *intClass = new ClassTreeNode("Int", FormalArgs(), 0, Methods(), Statements());
     intClass->superclass = this;
     Methods intMethods;
+    intMethods.methods.push_back(Method("STRING", FormalArgs(), "String", Statements(), 0));
     intMethods.methods.push_back(Method("PLUS",
         FormalArgs(FormalArg("other", "Int")), "Int", Statements(), 0));
     intMethods.methods.push_back(Method("MINUS",
@@ -83,6 +87,7 @@ ClassTreeNode::ClassTreeNode(Classes &cls) {
     ClassTreeNode *stringClass = new ClassTreeNode("String", FormalArgs(), 0, Methods(), Statements());
     stringClass->superclass = this;
     Methods stringMethods;
+    stringMethods.methods.push_back(Method("STRING", FormalArgs(), "String", Statements(), 0));
     stringMethods.methods.push_back(Method("PLUS",
         FormalArgs(FormalArg("other", "String")), "String", Statements(), 0));
     stringMethods.methods.push_back(Method("ATMOST",
@@ -101,6 +106,7 @@ ClassTreeNode::ClassTreeNode(Classes &cls) {
     ClassTreeNode *boolClass = new ClassTreeNode("Boolean", FormalArgs(), 0, Methods(), Statements());
     boolClass->superclass = this;
     Methods boolMethods;
+    boolMethods.methods.push_back(Method("STRING", FormalArgs(), "String", Statements(), 0));
     boolMethods.methods.push_back(Method("EQUALS",
         FormalArgs(FormalArg("other", "Boolean")), "Boolean", Statements(), 0));
     boolMethods.methods.push_back(Method("OR",
