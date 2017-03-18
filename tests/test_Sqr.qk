@@ -2,6 +2,9 @@
  * A simple sample Quack program
  *
  *   note: this version has been edited to pass type checking
+ *   This program shows a reasonably amount of type checking and some code gen.
+ *   Probably the most exciting thing to note is dynamic dispatch happens
+ *   properly.
  */
 
 class Pt(x: Int, y: Int) {
