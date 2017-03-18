@@ -12,7 +12,12 @@ class Pt(x: Int, y: Int) {
   }
 
   def PLUS(other: Pt) : Pt {
-      return Pt(this.x + other.x, this.y + other.y);
+    while (this.x > this.y) {
+      while (this.x > this.y) {
+        this.x = this.x + 1;
+      }
+    }
+    return Pt(this.x + other.x, this.y + other.y);
   }
 
   def upWhile(r: Rect) {
@@ -42,12 +47,14 @@ class Rect(ll: Pt, ur: Pt) extends Obj {
   this.ur = ur;
   this.num = 5;
   this.z = 5;
+  this.z.PRINT();
 
   def translate(delta: Pt) : Rect { return Rect(this.ll+delta, this.ur+delta); }
 
   def STR() : String {
       lr = Pt( this.ur._y(), this.ll._x() );  // lower right
       ul = Pt( this.ll._x(), this.ur._y() );  // upper left
+      lr.EQUAL(ul);
       return "(" + this.ll.STR() + ", "
                  +      ul.STR() + ","
                  + this.ur.STR() + ","

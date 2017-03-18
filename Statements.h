@@ -66,13 +66,6 @@ public:
     Statements block;
 };
 
-class ElseStatement : public Statement {
-public:
-    ElseStatement(int l, Statements s): Statement(l), ss(s) {}
-    std::string print() override;
-    Statements ss;
-};
-
 class Conditional : public Statement {
 public:
     Conditional(int l): Statement(l) {}

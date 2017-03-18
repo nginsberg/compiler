@@ -204,6 +204,8 @@ string generateMethod(Method m, std::string thisType) {
     // Signature
     ret += "obj_" + m.retType + " " + thisType + "_method_" + m.name + "(obj_" + thisType + " this" + spacer + generateArgList(m.fArgs) + ") {\n";
     ret += generateVarDecs(m.stmts.scope, m.fArgs);
+    ret += "\n";
+    ret += generateStatements(m.stmts);
     ret += "}\n";
 
     return ret;
@@ -233,6 +235,45 @@ string generateVarDecs(Scope s, FormalArgs passedIn) {
     return ret;
 }
 
-string generateStatements(Statements stmts) { return ""; }
+string generateStatements(Statements stmts, string buffer) {
+    string ret = "";
 
-string generateStatement(Statement *stmt) { return ""; }
+    for (auto s = stmts.ss.begin(); s != stmts.ss.end(); ++s) {
+        ret += generateStatement(*s, buffer);
+    }
+
+    return ret;
+}
+
+string generateStatement(Statement *stmt, string buffer) {
+    string ret = "";
+
+    if (BareStatement *bare = dynamic_cast<BareStatement *>(stmt)) {
+        ret += buffer + "\t" + bare->expr->print() + ";\n";
+    } else if (AssignStatement *assign = dynamic_cast<AssignStatement *>(stmt)) {
+        ret += buffer + "\t" + assign->to->print() + " = " + assign->from->print() + ";\n";
+    } else if (ReturnStatement *retStat = dynamic_cast<ReturnStatement *>(stmt)) {
+        ret += buffer + "\treturn " + retStat->ret->print() + ";\n";
+    } else if (WhileStatement *whileStat = dynamic_cast<WhileStatement *>(stmt)) {
+        ret += buffer + "\twhile (" + whileStat->ifTrue->print() + ") {\n";
+        ret += generateStatements(whileStat->block, buffer + "\t");
+        ret += buffer + "\t}\n";
+    } else if (Conditional *cond = dynamic_cast<Conditional *>(stmt)) {
+        auto ifTrue = cond->conditionals.begin();
+        auto block = cond->blocks.begin();
+
+        ret += buffer + "\tif (" + (*ifTrue)->print() + ") {\n";
+        ret += generateStatements(*block, buffer + "\t");
+        ++ifTrue; ++block;
+
+        while (ifTrue != cond->conditionals.end()) {
+            ret += buffer + "\t} else if (" + (*ifTrue)->print() + ") {\n";
+            ret += generateStatements(*block, buffer + "\t");
+            ++ifTrue; ++block;
+        }
+
+        ret += buffer + "\t}\n";
+    }
+
+    return ret;
+}

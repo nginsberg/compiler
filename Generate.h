@@ -29,8 +29,8 @@ std::string generateMethod(Method m, std::string thisType);
 
 std::string generateVarDecs(Scope s, FormalArgs passedIn);
 
-std::string generateStatements(Statements stmts);
+std::string generateStatements(Statements stmts, std::string buffer = "");
 
-std::string generateStatement(Statement *stmt);
+std::string generateStatement(Statement *stmt, std::string buffer);
 
 #endif
