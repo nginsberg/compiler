@@ -7,7 +7,7 @@ class Pt(x: Int, y: Int) {
   this.y = y;
   this.b = false;
 
-  def STR() : String {
+  def STRING() : String {
       return this.x.STRING() + this.y.STRING();
   }
 
@@ -47,7 +47,6 @@ class Rect(ll: Pt, ur: Pt) extends Obj {
   this.ur = ur;
   this.num = 5;
   this.z = 5;
-  this.z.PRINT();
 
   def translate(delta: Pt) : Rect { return Rect(this.ll+delta, this.ur+delta); }
 
@@ -55,10 +54,10 @@ class Rect(ll: Pt, ur: Pt) extends Obj {
       lr = Pt( this.ur._y(), this.ll._x() );  // lower right
       ul = Pt( this.ll._x(), this.ur._y() );  // upper left
       lr.EQUAL(ul);
-      return "(" + this.ll.STR() + ", "
-                 +      ul.STR() + ","
-                 + this.ur.STR() + ","
-                 +      lr.STR() + ")";
+      return "(" + this.ll.STRING() + ", "
+                 +      ul.STRING() + ","
+                 + this.ur.STRING() + ","
+                 +      lr.STRING() + ")";
   }
 }
 
@@ -84,3 +83,5 @@ class Test() extends Square {
 a_square = Square( Pt(3,3), 5 );
 a_square = a_square.translate( Pt(2,2) );
 pt = Pt(3,3);
+pt.PRINT();
+"\n".PRINT();

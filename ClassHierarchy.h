@@ -55,6 +55,7 @@ std::ostream &operator<<(std::ostream &os, const Classes &cls);
 struct MethodTableEntry {
     std::string methodName;
     std::string generatedSignature;
+    std::string generatedName;
 };
 
 class ClassTreeNode {

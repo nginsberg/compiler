@@ -17,6 +17,7 @@ string generateCode(ClassTreeNode *AST) {
     string forwardDecs = "";
     string structDefs = "";
     string methodDefs = "";
+    string singletonDefs = "";
 
     while(!toProcess.empty()) {
         ClassTreeNode *current = toProcess.front();
@@ -37,6 +38,8 @@ string generateCode(ClassTreeNode *AST) {
             structDefs += "\n";
             methodDefs += generateMethods(current);
             methodDefs += "\n";
+            singletonDefs += generateSingleton(current);
+            singletonDefs += "\n";
         }
 
         if (skip) {
@@ -50,8 +53,7 @@ string generateCode(ClassTreeNode *AST) {
     }
 
     string ret = "#include \"Builtins.h\"\n\n";
-    ret += forwardDecs + structDefs + methodDefs;
-    ret += "int main() { return 0; }\n";
+    ret += forwardDecs + structDefs + methodDefs + singletonDefs;
     return ret;
 }
 
@@ -151,6 +153,10 @@ string generateMethodSignature(Method m, string thisType) {
     return ret;
 }
 
+string generateMethodName(Method m, string thisType) {
+    return thisType + "_method_" + m.name;
+}
+
 string generateClassStructContents(ClassTreeNode *c) {
     string ret = "";
 
@@ -180,6 +186,7 @@ string generateClassStructContents(ClassTreeNode *c) {
                 MethodTableEntry override;
                 override.methodName = name;
                 override.generatedSignature = generateMethodSignature(c->methods.methodForName(name), c->className);
+                override.generatedName = generateMethodName(c->methods.methodForName(name), c->className);
                 c->methodTable.push_back(override);
             }
         }
@@ -190,6 +197,7 @@ string generateClassStructContents(ClassTreeNode *c) {
         MethodTableEntry newMethod;
         newMethod.methodName = *name;
         newMethod.generatedSignature = generateMethodSignature(c->methods.methodForName(*name), c->className);
+        newMethod.generatedName = generateMethodName(c->methods.methodForName(*name), c->className);
         c->methodTable.push_back(newMethod);
     }
 
@@ -340,7 +348,7 @@ string generateConstructor(ClassTreeNode *c) {
 
     ret += "obj_" + c->className + " new_" + c->className + "(" + generateArgList(c->fArgs) + ") {\n";
     ret += "\tobj_" + c->className + " this = malloc(sizeof(struct obj_" + c->className + "_struct));\n";
-    ret += "\tthis->clazz = the_clas_" + c->className + ";\n";
+    ret += "\tthis->clazz = the_class_" + c->className + ";\n";
     ret += "\n";
     ret += generateStatements(c->stmts, c->scope);
     ret += "\treturn this;\n";
@@ -349,9 +357,36 @@ string generateConstructor(ClassTreeNode *c) {
     return ret;
 }
 
+string generateSingleton(ClassTreeNode *c) {
+    string ret = "";
 
+    ret += "struct class_" + c->className + "_struct the_class_" + c->className + "_struct = {\n";
+    ret += "\tnew_" + c->className + ",\n";
 
+    for (int i = 0; i < c->methodTable.size(); ++i) {
+        string comma = i+1 == c->methodTable.size() ? "" : ",";
+        ret += "\t" + c->methodTable[i].generatedName + comma + "\n";
+    }
 
+    ret += "};\n";
+    ret += "\n";
+    ret += "class_" + c->className + " the_class_" + c->className + " = &the_class_" + c->className + "_struct;\n";
+
+    return ret;
+}
+
+string generateMain(Statements stmts, Scope s) {
+    string ret = "";
+
+    ret += "int main() {\n";
+    ret += generateVarDecs(Scope(), s, "");
+    ret += "\n";
+    ret += generateStatements(stmts, s, "");
+    ret += "\treturn 0;\n";
+    ret += "}\n";
+
+    return ret;
+}
 
 
 

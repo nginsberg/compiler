@@ -466,6 +466,7 @@ int main(int argc, char** argv) {
     if (numErrors || !passStatic) { return -1; }
 
     outFile << generateCode(&classHierarchy) << endl;
+    outFile << generateMain(*stmts, mainScope);
 
     return 0;
 }

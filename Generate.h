@@ -19,6 +19,8 @@ std::string generateMethods(ClassTreeNode *c);
 
 std::string generateMethodSignature(Method m, std::string thisType);
 
+std::string generateMethodName(Method m, std::string thisType);
+
 std::string generateTypeList(FormalArgs args);
 
 std::string generateArgList(FormalArgs args);
@@ -40,5 +42,9 @@ std::string generateArgList(ActualArgs args);
 std::string generateExpression(RExpr *expr);
 
 std::string generateConstructor(ClassTreeNode *c);
+
+std::string generateSingleton(ClassTreeNode *c);
+
+std::string generateMain(Statements stmts, Scope s);
 
 #endif
