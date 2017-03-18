@@ -6,6 +6,7 @@
 #include "Methods.h"
 #include "ClassHierarchy.h"
 #include "Generate.h"
+#include "Expressions.h"
 
 using namespace std;
 
@@ -206,6 +207,11 @@ string generateMethod(Method m, std::string thisType) {
     ret += generateVarDecs(m.stmts.scope, m.fArgs);
     ret += "\n";
     ret += generateStatements(m.stmts, m.stmts.scope);
+    if (m.retType == "Nothing") {
+        RExpr *constructor = new ConstructorCall(0, "Nothing", ActualArgs());
+        ReturnStatement retStat = ReturnStatement(0, constructor);
+        ret += generateStatement(&retStat, "", m.stmts.scope);
+    }
     ret += "}\n";
 
     return ret;
