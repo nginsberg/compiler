@@ -205,7 +205,7 @@ string generateMethod(Method m, std::string thisType) {
     ret += "obj_" + m.retType + " " + thisType + "_method_" + m.name + "(obj_" + thisType + " this" + spacer + generateArgList(m.fArgs) + ") {\n";
     ret += generateVarDecs(m.stmts.scope, m.fArgs);
     ret += "\n";
-    ret += generateStatements(m.stmts);
+    ret += generateStatements(m.stmts, m.stmts.scope);
     ret += "}\n";
 
     return ret;
@@ -235,17 +235,29 @@ string generateVarDecs(Scope s, FormalArgs passedIn) {
     return ret;
 }
 
-string generateStatements(Statements stmts, string buffer) {
+string generateVarDecs(Scope declared, Scope newScope, string buffer) {
     string ret = "";
 
-    for (auto s = stmts.ss.begin(); s != stmts.ss.end(); ++s) {
-        ret += generateStatement(*s, buffer);
+    for (auto tok = newScope.tokens.begin(); tok != newScope.tokens.end(); ++tok) {
+        if (declared.tokens.find(tok->first) != declared.tokens.end()) { continue; }
+
+        ret += buffer + "\tobj_" + tok->second + " " + tok->first + ";\n";
     }
 
     return ret;
 }
 
-string generateStatement(Statement *stmt, string buffer) {
+string generateStatements(Statements stmts, Scope sc, string buffer) {
+    string ret = "";
+
+    for (auto s = stmts.ss.begin(); s != stmts.ss.end(); ++s) {
+        ret += generateStatement(*s, buffer, sc);
+    }
+
+    return ret;
+}
+
+string generateStatement(Statement *stmt, string buffer, Scope s) {
     string ret = "";
 
     if (BareStatement *bare = dynamic_cast<BareStatement *>(stmt)) {
@@ -255,20 +267,23 @@ string generateStatement(Statement *stmt, string buffer) {
     } else if (ReturnStatement *retStat = dynamic_cast<ReturnStatement *>(stmt)) {
         ret += buffer + "\treturn " + generateExpression(retStat->ret) + ";\n";
     } else if (WhileStatement *whileStat = dynamic_cast<WhileStatement *>(stmt)) {
+        ret += generateVarDecs(s, whileStat->block.scope, buffer + "\t");
         ret += buffer + "\twhile (" + generateExpression(whileStat->ifTrue) + " == lit_true) {\n";
-        ret += generateStatements(whileStat->block, buffer + "\t");
+        ret += generateStatements(whileStat->block, s, buffer + "\t");
         ret += buffer + "\t}\n";
     } else if (Conditional *cond = dynamic_cast<Conditional *>(stmt)) {
         auto ifTrue = cond->conditionals.begin();
         auto block = cond->blocks.begin();
 
         ret += buffer + "\tif (" + generateExpression(*ifTrue) + " == lit_true) {\n";
-        ret += generateStatements(*block, buffer + "\t");
+        ret += generateVarDecs(s, block->scope, buffer + "\t");
+        ret += generateStatements(*block, s, buffer + "\t");
         ++ifTrue; ++block;
 
         while (ifTrue != cond->conditionals.end()) {
             ret += buffer + "\t} else if (" + generateExpression(*ifTrue) + " == lit_true) {\n";
-            ret += generateStatements(*block, buffer + "\t");
+            ret += generateVarDecs(s, block->scope, buffer + "\t");
+            ret += generateStatements(*block, s, buffer + "\t");
             ++ifTrue; ++block;
         }
 
