@@ -249,25 +249,25 @@ string generateStatement(Statement *stmt, string buffer) {
     string ret = "";
 
     if (BareStatement *bare = dynamic_cast<BareStatement *>(stmt)) {
-        ret += buffer + "\t" + bare->expr->print() + ";\n";
+        ret += buffer + "\t" + generateExpression(bare->expr) + ";\n";
     } else if (AssignStatement *assign = dynamic_cast<AssignStatement *>(stmt)) {
-        ret += buffer + "\t" + assign->to->print() + " = " + assign->from->print() + ";\n";
+        ret += buffer + "\t" + generateExpression(assign->to) + " = " + generateExpression(assign->from) + ";\n";
     } else if (ReturnStatement *retStat = dynamic_cast<ReturnStatement *>(stmt)) {
-        ret += buffer + "\treturn " + retStat->ret->print() + ";\n";
+        ret += buffer + "\treturn " + generateExpression(retStat->ret) + ";\n";
     } else if (WhileStatement *whileStat = dynamic_cast<WhileStatement *>(stmt)) {
-        ret += buffer + "\twhile (" + whileStat->ifTrue->print() + ") {\n";
+        ret += buffer + "\twhile (" + generateExpression(whileStat->ifTrue) + " == lit_true) {\n";
         ret += generateStatements(whileStat->block, buffer + "\t");
         ret += buffer + "\t}\n";
     } else if (Conditional *cond = dynamic_cast<Conditional *>(stmt)) {
         auto ifTrue = cond->conditionals.begin();
         auto block = cond->blocks.begin();
 
-        ret += buffer + "\tif (" + (*ifTrue)->print() + ") {\n";
+        ret += buffer + "\tif (" + generateExpression(*ifTrue) + " == lit_true) {\n";
         ret += generateStatements(*block, buffer + "\t");
         ++ifTrue; ++block;
 
         while (ifTrue != cond->conditionals.end()) {
-            ret += buffer + "\t} else if (" + (*ifTrue)->print() + ") {\n";
+            ret += buffer + "\t} else if (" + generateExpression(*ifTrue) + " == lit_true) {\n";
             ret += generateStatements(*block, buffer + "\t");
             ++ifTrue; ++block;
         }
@@ -277,3 +277,68 @@ string generateStatement(Statement *stmt, string buffer) {
 
     return ret;
 }
+
+string generateArgList(ActualArgs args) {
+    string ret = "";
+
+    for (auto arg = args.args.begin(); arg != args.args.end(); ++arg) {
+        ret += generateExpression(*arg);
+        if (arg != --args.args.end()) { ret += ", "; }
+    }
+
+    return ret;
+}
+
+string generateExpression(RExpr *expr) {
+    if (StringLit *strLit = dynamic_cast<StringLit *>(expr)) {
+        return "str_literal(" + strLit->val + ")";
+    } else if (IntLit *intLit = dynamic_cast<IntLit *>(expr)) {
+        return "int_literal(" + to_string(intLit->val) + ")";
+    } else if (BoolLit *boolLit = dynamic_cast<BoolLit *>(expr)) {
+        if (boolLit->val) { return "lit_true"; }
+        return "lit_false";
+    } else if (LExpr *lexpr = dynamic_cast<LExpr *>(expr)) {
+        string ret = lexpr->expr ? generateExpression(lexpr->expr) + "->" : "";
+        return ret + lexpr->ident;
+    } else if (ConstructorCall *constructor = dynamic_cast<ConstructorCall *>(expr)) {
+        return "the_class_" + constructor->className + "->constructor(" + generateArgList(constructor->args) + ")";
+    } else if (FunctionCall *func = dynamic_cast<FunctionCall *>(expr)) {
+        string calledOn = generateExpression(func->expr);
+        string argList = generateArgList(func->args);
+        if (argList != "") { argList = ", " + argList; }
+        return calledOn + "->clazz->" + func->functionName + "(" + calledOn + argList + ")";
+    }
+    return expr->print();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -33,4 +33,8 @@ std::string generateStatements(Statements stmts, std::string buffer = "");
 
 std::string generateStatement(Statement *stmt, std::string buffer);
 
+std::string generateArgList(ActualArgs args);
+
+std::string generateExpression(RExpr *expr);
+
 #endif
